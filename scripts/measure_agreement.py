@@ -1,5 +1,12 @@
 #!/usr/bin/env python2.7
 
+"""
+Script for measuring agreeement of an RST corpus.
+
+USAGE:
+script_name [OPTIONS] src_dir anno_dir1 anno_dir2
+"""
+
 ##################################################################
 # Libraries
 import argparse
@@ -25,32 +32,25 @@ INTERNAL_RST = {}
 EXTNID = "msgs2extnid"
 EXTERNAL_RST = {}
 
+SEGMENTS1 = {}
+SEGMENTS2 = {}
+
 ##################################################################
 # Methods
-def _read_anno_file(a_anno_fname, a_chck_flags):
+def _read_anno_file(a_anno_fname, a_chck_flags, a_rst):
     """
     Read annotation file and return a dictionary of annotation elements.
 
     @param a_anno_fname - name of the 1-st file containing annotation
     @param a_chck_flags - flags specifying which elements should be checked
+    @param a_rst - RST tree to be populated from the given file
 
     @return \c void
     """
     with open(a_anno_fname) as ifile:
         fields = {}
         for line in ifile:
-            line = line.decode(ENCODING)
-            if not line:
-                continue
-            fields = line.split(FIELD_SEP)
-            if fields[0] == EXTNID:
-                for :
-                    pass
-            elif fields[0] == INTNID:
-                for :
-                    pass
-            else:
-                raise u"Unrecognized line format: {:s}".format(line).encode(ENCODING)
+            a_rst.parse_tsv(line.decode(ENCODING))
 
 def output_agreement(a_kappa_stat = KAPPA_STAT, a_header = "total"):
     """
@@ -80,9 +80,12 @@ def main(argv):
 
     @return \c 0 on SUCCESS non \c 0 otherwise
     """
+    global ENCODING
     # define command line arguments
     aparser = argparse.ArgumentParser(description = "Script for measuring corpus agreement on RST.")
     # optional arguments
+    aparser.add_argument("-e", "--encoding", help = """encoding of input document""",
+                         type = str, default = "utf-8")
     aparser.add_argument("--type", help = """type of element (relation) for which to measure
 the agreement""", choices = [SEGMENTS, NUCLEARITY, RELATIONS], type = str, action = "append")
     aparser.add_argument("--src-ptrn", help = "shell pattern of source files", type = str,
@@ -96,8 +99,8 @@ the agreement""", choices = [SEGMENTS, NUCLEARITY, RELATIONS], type = str, actio
     aparser.add_argument("anno1_dir", help = "directory with annotation files for first annotator")
     aparser.add_argument("anno2_dir", help = "directory with annotation files for second annotator")
     args = argparser.parse_args(argv)
-    # iterate over each source file in `source` directory and find
-    # corresponding annotation files
+    # set parameters
+    ENCODING = args.encoding
     chck_flags = 0
     if args.type:
         for itype in set(args.type):
@@ -110,7 +113,8 @@ the agreement""", choices = [SEGMENTS, NUCLEARITY, RELATIONS], type = str, actio
     else:
         chck_flags |= 7         # by default, measure agreement on all elements
 
-    # process source and annotation files
+    # iterate over each source file in `source` directory and find
+    # corresponding annotation files
     anno1_fname = ""
     anno2_fname = ""
     src_fname_base = ""
