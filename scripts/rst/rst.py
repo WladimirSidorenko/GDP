@@ -1,28 +1,4 @@
-#!/usr/bin/env python2.7
 
-##################################################################
-# Documentation
-
-"""
-Module for analyzing, constructing, and modifying RST trees.
-
-Constants:
-FIELD_SEP - field separator for TSV format (tab character in other words)
-LIST_SEP - list items separator for TSV format
-VALUE_SEP - attribute-value separator for TSV format
-EXT_NID - string denoting start of description of an external node
-INT_NID - string denoting start of description of an internal node
-
-Classes:
-RSTForrest - class for dealing with collections of RST trees
-RSTTree - class for dealing with a single RST tree
-RSTNode - class representing single RST node
-
-Exceptions:
-IncorrectStructure - raised when data structure to be read appears to be broken
-IncorrectFormat - raised when attempting to parse an incorrect line
-
-"""
 
 ##################################################################
 # Libraries
@@ -30,12 +6,6 @@ from union_find import UnionFind
 
 ##################################################################
 # Constants
-FIELD_SEP = '\t'
-LIST_SEP = ','
-VALUE_SEP = '\034'
-
-EXT_NID = "msgs2extnid"
-INT_NID = "nid"
 
 ##################################################################
 # Class RSTForrest
@@ -111,6 +81,7 @@ class RSTTree(object):
 
         @param a_line - line with bad formatting
         """
+        pass
 
 ##################################################################
 # Exceptions

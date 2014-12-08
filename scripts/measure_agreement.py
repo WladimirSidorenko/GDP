@@ -38,20 +38,20 @@ SEGMENTS2 = {}
 
 ##################################################################
 # Methods
-# def _read_anno_file(a_anno_fname, a_chck_flags, a_rst):
-#     """
-#     Read annotation file and return a dictionary of annotation elements.
+def _read_anno_file(a_anno_fname, a_chck_flags, a_rst):
+    """
+    Read annotation file and return a dictionary of annotation elements.
 
-#     @param a_anno_fname - name of the 1-st file containing annotation
-#     @param a_chck_flags - flags specifying which elements should be checked
-#     @param a_rst - RST tree to be populated from the given file
+    @param a_anno_fname - name of the 1-st file containing annotation
+    @param a_chck_flags - flags specifying which elements should be checked
+    @param a_rst - RST tree to be populated from the given file
 
-#     @return \c void
-#     """
-#     with open(a_anno_fname) as ifile:
-#         fields = {}
-#         for line in ifile:
-#             a_rst.parse_tsv(line.decode(ENCODING))
+    @return \c void
+    """
+    with open(a_anno_fname) as ifile:
+        fields = {}
+        for line in ifile:
+            a_rst.parse_tsv(line.decode(ENCODING))
 
 def output_agreement(a_kappa_stat = KAPPA_STAT, a_header = "total"):
     """
@@ -196,10 +196,12 @@ the agreement""", choices = [SEGMENTS, NUCLEARITY, RELATIONS], type = str, actio
             continue
         # check annotation files corresponding to the given source file
         src_fname_base = os.path.splitext(os.path.basename(src_fname))[0]
-        anno1_fname = glob.glob(os.path.join(args.anno1_dir, src_fname_base + args.anno_sfx) + "*")[0]
+        anno1_fname = glob.glob(os.path.join(args.anno1_dir, src_fname_base + args.anno_sfx) + \
+                                    args.anno_sfx)[0]
         if not os.path.isfile(anno1_fname) or not os.access(anno1_fname, os.R_OK):
             continue
-        anno2_fname = glob.glob(os.path.join(args.anno2_dir, src_fname_base + args.anno_sfx) + "*")[0]
+        anno2_fname = glob.glob(os.path.join(args.anno2_dir, src_fname_base + args.anno_sfx) + \
+                                    args.anno_sfx)[0]
         if not os.path.isfile(anno2_fname) or not os.access(anno2_fname, os.R_OK):
             continue
         # measure agreement for the given annotation files
