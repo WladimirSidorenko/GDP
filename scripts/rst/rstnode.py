@@ -1,6 +1,7 @@
 ##################################################################
 # Imports
-from constants import LIST_SEP, FIELD_SEP, VALUE_SEP
+from constants import LIST_SEP, FIELD_SEP, VALUE_SEP, \
+    TSV_FMT
 from exceptions import RSTBadFormat
 
 ##################################################################
@@ -42,20 +43,32 @@ class RSTNode(object):
 
     def update(self, a_attrs):
         """
-        Update information about node attributes from given dictionary.
+        Update information about node attributes from dictionary.
 
         @param a_attrs - dictionary with information about the node
 
         @return \c void
         """
         if "offsets" in a_attrs:
-            if len(a_attrs["offsets"]):
-                raise RSTBadFormat()
-            self.start, self.end = a_attrs["offsets"]
+            if len(a_attrs["offsets"]) == 2:
+                self.start, self.end = a_attrs["offsets"]
+            elif a_attrs["offsets"]:
+                raise RSTBadFormat(VALUE_SEP.join(a_attrs["offsets"]))
 
         for k, v in a_attrs.iteritems():
             if hasattr(self, k):
-                getattr(self, k) = v
+                setattr(self, k, v)
+
+    def __cmp__(self, a_other):
+        """
+        Compare given node with another one.
+
+        @param a_other - node to compare with
+
+        @return negative integer if self is less than, zero if equal to, and
+        positive integer if self is greate than its argument
+        """
+        return cmp(self.start, a_other.start)
 
     def __str__(self, a_fmt = TSV_FMT):
         """

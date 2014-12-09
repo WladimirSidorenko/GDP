@@ -1,3 +1,6 @@
+# default encoding
+ENCODING = "utf-8"
+
 # field separators for TSV format
 LIST_SEP = ','
 FIELD_SEP = '\t'

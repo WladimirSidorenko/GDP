@@ -30,7 +30,7 @@ class RSTBadStructure(RSTException):
 
         @return string containing the error message
         """
-        return self.__unicode__()
+        return self.msg.encode(ENCODING)
 
     def __unicode__(self):
         """
@@ -65,7 +65,7 @@ class RSTBadFormat(RSTException):
 
         @return string containing the error message
         """
-        return self.__unicode__()
+        return self.msg.encode(ENCODING)
 
     def __unicode__(self):
         """

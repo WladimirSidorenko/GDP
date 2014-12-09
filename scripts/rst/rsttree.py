@@ -1,8 +1,11 @@
 ##################################################################
 # Imports
-from constants import LIST_SEP, FIELD_SEP, VALUE_SEP, EXT_NID, INT_NID, \
-    TSV_FMT, LSP_FMT, PC3_FMT
+from constants import LIST_SEP, FIELD_SEP, VALUE_SEP, \
+    EXT_NID, INT_NID, TSV_FMT, LSP_FMT, PC3_FMT
 from exceptions import RSTBadFormat, RSTBadStructure
+from rstnode import RSTNode
+
+import bisect
 
 ##################################################################
 # Class
@@ -12,12 +15,13 @@ class RSTTree(object):
 
     Instance Variables:
     msg_id - id of the message to which this tree belongs
-    root - pointer to root node of that tree
-    nodes - dictionary mapping node id's to RST
+    root - index of the root node of the given tree
+    nodes - dictionary mapping node id to RSTNode
     leaves - id's of nodes which are terminals in given tree
 
     Methods:
-    parse - parse lines in tab separated value format
+    add_node - add new node to RST tree
+    update_node - update information about given node in the tree
     """
 
     def __init__(self, a_msg_id = None):
@@ -27,42 +31,45 @@ class RSTTree(object):
         @param a_msg_id - line with bad formatting
         """
         self.msg_id = a_msg_id
+        self.nodes = {}
+        self.leaves = []
+        self.root = None
 
-    def _parse_tsv(self, a_line):
+    def add_node(self, a_nid, a_attrs = {}):
         """
-        Parse line in tab-separated value format.
+        Add new node to the tree.
 
-        @param a_line - line to be parsed
+        @param a_nid - id of new given node
+        @param a_attrs - attributes of new given node
 
         @return \c void
         """
-        if not a_line:
-            return
+        if a_nid in self.nodes:
+            raise RSTBadFormat(u"Node {:s} already exists.".format(a_nid))
+        inode = self.nodes[a_nid] = RSTNode(a_nid)
+        self.update_node(a_nid, a_attrs)
 
-        fields = a_line.split(FIELD_SEP)
-        if fields[0] != INT_NID:
-            if fields[0] == EXT_NID:
-                raise RSTBadFormat(a_line + u". Consider using RSTForrest instead.")
-            else:
-                raise RSTBadFormat(a_line)
-        elif fields[2] != self.msg_id:
-            raise RSTBadFormat(a_line + u""".  Message id of the node disagrees with message id
-of the tree.""")
-        nid = fields[1]
-        if nid not in self.nodes:
-            self.nodes[nid] = RSTNode(nid)
-        # convert parsed fields to a dictionary and update information about the node
-        inode = self.nodes[nid]
-        inode.update(dic([(f[0], f[1:]) for f in \
-                              [fld.split(VALUE_SEP) for fld in fields]]))
-        if node.parent == None:
+    def update_node(self, a_nid, a_attrs):
+        """
+        Update information about the given node.
+
+        @param a_nid - id of the node to be updated
+        @param a_attrs - new attributes of the node
+
+        @return \c void
+        """
+        inode = self.nodes[a_nid]
+        inode.update(a_attrs)
+        if inode.parent != None:
             if self.root != None:
-                raise RSTBadStructure("Multiple roots found in tree.")
+                raise RSTBadStructure(u"Multiple roots found in tree (cf. nid {:s})".format(a_nid))
+            else:
+                self.root = a_nid
+        if inode.type == "text":
+            # leaves should keep the relative order of their segments
+            bisect.insort(self.leaves, inode)
 
-        if node.type == "text":
-            self.leaves.append(node.inid)
-
-    def __str__(self, a_fmt = TSV_OFMT):
+    def __str__(self, a_fmt = TSV_FMT):
         """Produce string representation of given tree.
 
         @param a_fmt - output format
@@ -71,7 +78,7 @@ of the tree.""")
         """
         raise NotImplementedError
 
-    def __unicode__(self, a_fmt = TSV_OFMT):
+    def __unicode__(self, a_fmt = TSV_FMT):
         """Produce unicode representation of given tree.
 
         @param a_fmt - output format
