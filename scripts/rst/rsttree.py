@@ -14,10 +14,11 @@ class RSTTree(object):
     Class for analyzing and processing single RST tree.
 
     Instance Variables:
+    extnodes - dictionary, mapping internal node id's to RSTNode's
+    intnodes - dictionary, mapping internal node id's to RSTNode's
+    leaves - id's of nodes which are terminals in given tree
     msg_id - id of the message to which this tree belongs
     root - index of the root node of the given tree
-    nodes - dictionary mapping node id to RSTNode
-    leaves - id's of nodes which are terminals in given tree
 
     Methods:
     add_node - add new node to RST tree
@@ -31,7 +32,8 @@ class RSTTree(object):
         @param a_msg_id - line with bad formatting
         """
         self.msg_id = a_msg_id
-        self.nodes = {}
+        self.intnodes = {}
+        self.extnodes = {}
         self.leaves = []
         self.root = None
 
@@ -44,9 +46,9 @@ class RSTTree(object):
 
         @return \c void
         """
-        if a_nid in self.nodes:
+        if a_nid in self.intnodes:
             raise RSTBadFormat(u"Node {:s} already exists.".format(a_nid))
-        inode = self.nodes[a_nid] = RSTNode(a_nid)
+        inode = self.intnodes[a_nid] = RSTNode(a_nid)
         self.update_node(a_nid, a_attrs)
 
     def update_node(self, a_nid, a_attrs):
@@ -58,7 +60,7 @@ class RSTTree(object):
 
         @return \c void
         """
-        inode = self.nodes[a_nid]
+        inode = self.intnodes[a_nid]
         inode.update(a_attrs)
         if inode.parent != None:
             if self.root != None:
