@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE rstprj SYSTEM "../rstprj.dtd">
+
+<rstprj>
+  <format type="pc3m"/>
+  <relscheme type="PCC"/>
+  <erelscheme type="r-PCC"/>
+  <basedata>../basedata/1.general.txt</basedata>
+  <annotation>markables/1.general.rst.xml</annotation>
+</rstprj>
