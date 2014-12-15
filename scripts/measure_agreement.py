@@ -1,7 +1,7 @@
 #!/usr/bin/env python2.7
 
 """
-Script for measuring agreeement of an RST corpus.
+Script for measuring agreeement on RST corpus.
 
 USAGE:
 script_name [OPTIONS] src_dir anno_dir1 anno_dir2
@@ -66,8 +66,7 @@ def measure_agreement(a_src_fname, a_anno1_fname, a_anno2_fname, a_chck_flags):
     @param a_src_fname - name of source file with original text
     @param a_anno1_fname - name of the 1-st file containing annotation
     @param a_anno2_fname - name of the 2-nd file containing annotation
-    @param a_anno2_fname - name of the 2-nd file containing annotation
-    @param a_chck_flags - flags specifying which elements should be checked
+    @param a_chck_flags - flags specifying which elements should be tested
 
     @return \c void
     """
@@ -191,8 +190,9 @@ the agreement""", choices = [SEGMENTS, NUCLEARITY, RELATIONS], type = str, actio
     anno1_fname = ""
     anno2_fname = ""
     src_fname_base = ""
+
     for src_fname in glob.iglob(os.path.join(args.src_dir, args.src_ptrn)):
-        if not os.path.isfile(src_fname):
+        if not os.path.isfile(src_fname) or not os.access(src_fname, os.R_OK):
             continue
         # check annotation files corresponding to the given source file
         src_fname_base = os.path.splitext(os.path.basename(src_fname))[0]
