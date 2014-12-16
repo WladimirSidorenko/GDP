@@ -24,6 +24,8 @@ NUCLEARITY = "nuclearity"
 CHCK_NUCLEARITY = 2
 RELATIONS = "relations"
 CHCK_RELATIONS = 4
+ALL = "all"
+CHCK_ALL = 7
 
 ENCODING = "utf-8"
 FIELD_SEP = '\t'
@@ -107,7 +109,7 @@ def main(argv):
     argparser.add_argument("-e", "--encoding", help = """encoding of input document""",
                          type = str, default = "utf-8")
     argparser.add_argument("--type", help = """type of element (relation) for which to measure
-the agreement""", choices = [SEGMENTS, NUCLEARITY, RELATIONS], type = str, action = "append")
+the agreement""", choices = [SEGMENTS, NUCLEARITY, RELATIONS, ALL], type = str, default = ALL, action = "append")
     argparser.add_argument("--src-ptrn", help = "shell pattern of source files", type = str,
                          default = "*")
     argparser.add_argument("--anno-sfx", help = "extension of annotation files", type = str,
@@ -129,8 +131,10 @@ the agreement""", choices = [SEGMENTS, NUCLEARITY, RELATIONS], type = str, actio
                 chck_flags |= CHCK_NUCLEARITY
             elif itype == RELATIONS:
                 chck_flags |= CHCK_RELATIONS
+            elif itype == ALL:
+                chck_flags |= CHCK_ALL
     else:
-        chck_flags |= 7         # by default, measure agreement on all elements
+        chck_flags |= CHCK_ALL # by default, measure agreement on all elements
 
     # iterate over each source file in `source` directory and find
     # corresponding annotation files
