@@ -21,6 +21,10 @@ Exceptions:
 RSTException - abstract exception used as parent for all RST-related exceptions
 RSTBadFormat - raised when attempting to parse an incorrect line
 RSTBadStructure - raised when data structure to be read appears to be broken
+
+@author = Uladzimir Sidarenka
+@mail = <sidarenk at uni dash potsdam dot de>
+
 """
 
 ##################################################################

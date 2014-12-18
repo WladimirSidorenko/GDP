@@ -24,6 +24,7 @@ class RSTForrest(object):
     parse_line - general method for parsing lines (particular choice of
             parsing function will depend on the specified format)
     parse_tsv - parse lines in tab separated value format
+
     """
 
     def __init__(self):
