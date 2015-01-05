@@ -1,76 +1,67 @@
+#!/usr/bin/env python2.7
+
+##################################################################
+"""
+Module providing custom exceptions for RST package.
+
+Exception Classes:
+RSTException - abstract parent class of all RST excpetions
+RSTBadStructure - exception thrown when bad tree structure is encounted
+RSTBadFormat - exception thrown when bad line format is encounted
+
+"""
+
 ##################################################################
 class RSTException(Exception):
     """
-    Abstract exception class used as parent for all RST-related exceptions.
+    Exception class used as parent for all RST-related exceptions.
     """
-    pass
+    def __init__(self, a_msg):
+        """
+        Class constructor.
+
+        @param a_msg - line containing error description
+        """
+        super(RSTException, self).__init__(a_msg)
 
 ##################################################################
 class RSTBadStructure(RSTException):
     """
     Exception raised when data structure appears to be broken.
 
+    This class subclasses `RSTException` and simply passes its error
+    desciption to its parent class.
+
     Methods:
 
     Variables:
-    msg - message containing error description
     """
 
     def __init__(self, a_msg):
         """
         Class constructor.
 
-        @param a_line - line with bad formatting
+        @param a_line - line containing error description
         """
-        self.msg = a_msg
-
-    def __str__(self):
-        """
-        String representation.
-
-        @return string containing the error message
-        """
-        return self.msg.encode(ENCODING)
-
-    def __unicode__(self):
-        """
-        Unicode string representation.
-
-        @return unicode string containing the erro message
-        """
-        return self.msg.encode("utf-8")
+        super(RSTBadStructure, self).__init__(a_msg)
 
 ##################################################################
 class RSTBadFormat(RSTException):
     """
     Exception raised when attempting to parse an incorrect line.
 
+    This class subclasses `RSTException` and simply passes its error
+    desciption to its parent class.
+
     Methods:
 
     Variables:
-    msg - message containing description of an error
     """
 
     def __init__(self, a_line):
         """
         Class constructor.
 
-        @param a_line - line with bad formatting
+        @param a_line - line containing error description
         """
-        self.msg = u"Incorrect line format: '{:s}'".format(a_line)
-
-    def __str__(self):
-        """
-        String representation.
-
-        @return string containing the error message
-        """
-        return self.msg.encode(ENCODING)
-
-    def __unicode__(self):
-        """
-        Unicode string representation.
-
-        @return unicode string containing the erro message
-        """
-        return self.msg.encode("utf-8")
+        super(RSTBadStructure, self).__init__(a_msg)

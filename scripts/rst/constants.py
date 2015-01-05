@@ -9,6 +9,8 @@ VALUE_SEP = '\034'
 # node identificators used in TSV format
 INT_NID = "nid"
 EXT_NID = "msgs2extnid"
+OFFSETS = "offsets"
+CHILDREN = "children"
 
 # output formats
 TSV_FMT = 1
