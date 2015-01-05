@@ -11,6 +11,8 @@ INT_NID = "nid"
 EXT_NID = "msgs2extnid"
 OFFSETS = "offsets"
 CHILDREN = "children"
+PARENT = "parent"
+RELNAME = "relname"
 
 # output formats
 TSV_FMT = 1

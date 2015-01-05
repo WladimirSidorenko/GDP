@@ -49,7 +49,7 @@ class RSTTree(object):
     terminal - flag indicating whether this tree is a terminal node
 
     Methods:
-    add_child - add child tree
+    add_children - add child trees
     update - update tree attributes
     """
 
@@ -64,14 +64,15 @@ class RSTTree(object):
         self.msgid = None
         self.parent = None
         self.relname = None
-        self.children = set()
+        self.echildren = set()
+        self.ichildren = set()
         self.type = None
         self.end = -1
         self.start = -1
         self.text = ""
         self.terminal = False
         self._nestedness = 0          # nestedness level of this tree (used in print function)
-        self.update(a_attrs)
+        self.update(**a_attrs)
 
     def __cmp__(self, a_other):
         """
@@ -114,22 +115,26 @@ class RSTTree(object):
         ostr += u")"
         return ret
 
-    def add_child(self, a_child):
+    def add_children(self, *a_children):
         """
         Add new child tree.
 
-        @param a_child - child tree to be added
+        @param a_children - child trees to be added
 
         @return pointer to this tree
         """
-        self.children.add(a_child)
+        for ch in a_children:
+            if ch.msgid == self.msgid:
+                self.ichildren.add(ch)
+            else:
+                self.echildren.add(ch)
         return self
 
-    def update(self, a_attrs):
+    def update(self, **a_attrs):
         """
         Update tree's attributes.
 
-        @param a_attrs - attributes of the tree
+        @param a_attrs - dictionary of tree attributes
 
         @return \c void
         """
@@ -141,11 +146,7 @@ class RSTTree(object):
             a_attrs.pop(OFFSETS, None)
 
         if CHILDREN in a_attrs:
-            for ch in a_attrs[CHILDREN]:
-                if ch.msgid == self.msgid:
-                    self.ichildren.add(ch)
-                else:
-                    self.echildren.add(ch)
+            self.add_children(*a_attrs[CHILDREN])
             a_attrs.pop(CHILDREN, None)
 
         for k, v in a_attrs.iteritems():
