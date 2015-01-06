@@ -222,7 +222,7 @@ def _update_nuclearity_stat(a_argmnt_stat, a_txt, a_rsttree1, a_rsttree2, a_diff
     @return \c void
 
     """
-    raise NotImplementedError
+    pass
 
 def _update_relations_stat(a_argmnt_stat, a_txt, a_rsttree1, a_rsttree2, a_diff = False):
     """
@@ -237,7 +237,21 @@ def _update_relations_stat(a_argmnt_stat, a_txt, a_rsttree1, a_rsttree2, a_diff 
     @return \c void
 
     """
-    raise NotImplementedError
+    if a_diff:
+        diff_str = u""
+        edus1 = a_rsttree1.get_edus()
+        spans1 = dict([((edu.start, edu.end), edu) for edu in edus1])
+        edus2 = a_rsttree2.get_edus()
+        e1 = key = None
+        for e2 in edus2:
+            key = (e2.start, e2.end)
+            if key in spans1:
+                e1 = spans1[key]
+                if e1.relname != e2.relname:
+                    diff_str = e1.relname + u" ({:s}) vs. ({:s}) ".format(e1.id, e2.id) + e2.relname
+                    diff_str += u"\n" + unicode(a_rsttree1.parent)
+                    diff_str += u"\nvs\n" + unicode(a_rsttree2.parent)
+                    a_argmnt_stat[DIFF_IDX].append(diff_str)
 
 def _update_stat(a_argmnt_stat, a_txt, a_rsttree1, a_rsttree2, a_chck_flags, \
                      a_diff, a_sgm_strict):

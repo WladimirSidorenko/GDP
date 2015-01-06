@@ -106,7 +106,7 @@ class RSTTree(object):
         ret += u"(" + self.id
         if self.msgid is not None and (self.parent is None or self.parent.msgid != self.msgid):
             ret += u" (msgid " + self._escape_text(self.msgid) + ")"
-        ret += u" (type " + self._escape_text(self.type) + ")"
+        ret += u" (type " + self._escape_text(self.type or "") + ")"
         if self.relname:
             ret += u" (relname " + self._escape_text(self.relname) + ")"
         if self._terminal:
