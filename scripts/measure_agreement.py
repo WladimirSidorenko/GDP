@@ -116,7 +116,7 @@ def _compute_kappa(a_overlap, a_mrkbl1, a_mrkbl2, a_total):
     assert kappa <= 1.0, "Invalid kappa value: '{:.2f}'".format(kappa)
     return kappa
 
-def output_stat(a_ostream = sys.stdout, a_stat = KAPPA_STAT, a_header = ""):
+def output_stat(a_ostream = sys.stderr, a_stat = KAPPA_STAT, a_header = ""):
     """
     Output agreement statistics.
 
@@ -140,14 +140,43 @@ def output_stat(a_ostream = sys.stdout, a_stat = KAPPA_STAT, a_header = ""):
         kappa = _compute_kappa(overlap, mrkbl1, mrkbl2, total)
         print >> a_ostream, "{:15s}{:<15d}{:<15d}{:<15d}{:<15d}{:<15.2%}".format(\
             elname, overlap, mrkbl1, mrkbl2, total, kappa)
+        if elstat[DIFF_IDX]:
+            for d in elstat[DIFF_IDX]:
+                print "#\t" + elname
+                print d.encode(ENCODING)
 
-def _update_segment_stat(a_argmnt_stat, a_rsttree1, a_rsttree2, a_strict = False):
+def _generate_segment_diff(a_txt, a_bndr1, a_bndr2):
+    """
+    Generate difference on segments.
+
+    @param a_txt - raw text of the trees
+    @param a_bndr1 - set of discourse boundaries from the 1-st annotator
+    @param a_bndr2 - set of discourse boundaries from the 2-nd annotator
+
+    @return string representing boundary differencies
+
+    """
+    ret = ""
+    boundaries = [(b, "<1>") for b in a_bndr1 - a_bndr2]
+    boundaries += [(b, "<2>") for b in a_bndr2 - a_bndr1]
+    boundaries += [(b, "<>") for b in a_bndr1 & a_bndr2]
+    boundaries.sort(key = lambda el: el[0])
+    prev_b = 0
+    for b, tag in boundaries:
+        ret += a_txt[prev_b:b] + tag
+        prev_b = b
+    return ret
+
+def _update_segment_stat(a_argmnt_stat, a_txt, a_rsttree1, a_rsttree2, a_diff = False, \
+                             a_strict = False):
     """
     Update agreement statistics about segment boundaries.
 
     @param a_argmnt_stat - list containing relevant agreement statistics
+    @param a_txt - raw text of the trees
     @param a_rsttree1 - RST tree from 1-st annotation
     @param a_rsttree2 - RST tree from 2-nd annotation
+    @param a_diff - generate differences
     @param a_strict - apply strict comparison metric
 
     @return \c void
@@ -158,15 +187,18 @@ def _update_segment_stat(a_argmnt_stat, a_rsttree1, a_rsttree2, a_strict = False
     # update counters of EDU boundaries
     edus1 = a_rsttree1.get_edus()
     bndr1 = set([edu.end for edu in edus1])
+    bcnt1 = len(bndr1)
     # print >> sys.stderr, "edus1 = ", repr(edus1)
     # print >> sys.stderr, "bndr1 = ", repr(bndr1)
-    a_argmnt_stat[MRKBL1_IDX] += len(bndr1)
+    a_argmnt_stat[MRKBL1_IDX] += bcnt1
     edus2 = a_rsttree2.get_edus()
     bndr2 = set([edu.end for edu in edus2])
+    bcnt2 = len(bndr2)
     # print >> sys.stderr, "leaves2 = ", repr(a_rsttree2.get_edus())
     # print >> sys.stderr, "bndr2 = ", repr(bndr2)
-    a_argmnt_stat[MRKBL2_IDX] += len(bndr2)
-    a_argmnt_stat[OVERLAP_IDX] += len(bndr1 & bndr2)
+    a_argmnt_stat[MRKBL2_IDX] += bcnt2
+    agrmnt_cnt = len(bndr1 & bndr2)
+    a_argmnt_stat[OVERLAP_IDX] += agrmnt_cnt
     # the total number of possible EDU boundaries will depend on particular
     # scheme
     if a_strict:
@@ -174,41 +206,50 @@ def _update_segment_stat(a_argmnt_stat, a_rsttree1, a_rsttree2, a_strict = False
     else:
         a_argmnt_stat[TOTAL_IDX] += sum([len(e.text.split()) for e in edus1])
 
-def _update_nuclearity_stat(a_argmnt_stat, a_rsttree1, a_rsttree2):
+    if a_diff and (agrmnt_cnt != bcnt1 or agrmnt_cnt != bcnt2):
+        a_argmnt_stat[DIFF_IDX].append(_generate_segment_diff(a_txt, bndr1, bndr2))
+
+def _update_nuclearity_stat(a_argmnt_stat, a_txt, a_rsttree1, a_rsttree2, a_diff = False):
     """
     Update agreement statistics about nuclearity status of EDUs.
 
     @param a_argmnt_stat - list containing relevant agreement statistics
+    @param a_txt - raw text of the trees
     @param a_rsttree1 - RST tree from 1-st annotation
     @param a_rsttree2 - RST tree from 1-st annotation
+    @param a_diff - flag specifying whether differences should be generated
 
     @return \c void
 
     """
     raise NotImplementedError
 
-def _update_relations_stat(a_argmnt_stat, a_rsttree1, a_rsttree2):
+def _update_relations_stat(a_argmnt_stat, a_txt, a_rsttree1, a_rsttree2, a_diff = False):
     """
     Update agreement statistics about relation types between EDUs.
 
     @param a_argmnt_stat - list containing relevant agreement statistics
+    @param a_txt - raw text of the trees
     @param a_rsttree1 - RST tree from 1-st annotation
     @param a_rsttree2 - RST tree from 1-st annotation
+    @param a_diff - flag specifying whether differences should be generated
 
     @return \c void
 
     """
     raise NotImplementedError
 
-def _update_stat(a_argmnt_stat, a_rsttree1, a_rsttree2, a_chck_flags, \
-                     a_sgm_strict):
+def _update_stat(a_argmnt_stat, a_txt, a_rsttree1, a_rsttree2, a_chck_flags, \
+                     a_diff, a_sgm_strict):
     """
     Measure agreement of two RST trees.
 
     @param a_argmnt_stat - dictionary with agreement statistics to be updated
+    @param a_txt - raw text of the trees
     @param a_rsttree1 - RST tree from 1-st annotation
     @param a_rsttree2 - RST tree from 2-nd annotation
     @param a_chck_flags - flags specifying which elements should be tested
+    @param a_diff - flag specifying whether differences should be generated
     @param a_sgm_strict - flag indicating whether segment agreement should
                        apply strict metric
 
@@ -216,15 +257,17 @@ def _update_stat(a_argmnt_stat, a_rsttree1, a_rsttree2, a_chck_flags, \
 
     """
     if a_chck_flags & CHCK_SEGMENTS:
-        _update_segment_stat(a_argmnt_stat[SEGMENTS], a_rsttree1, a_rsttree2, \
-                                      a_sgm_strict)
+        _update_segment_stat(a_argmnt_stat[SEGMENTS], a_txt, a_rsttree1, a_rsttree2, \
+                                      a_diff, a_sgm_strict)
     if a_chck_flags & CHCK_NUCLEARITY:
-        _update_nuclearity_stat(a_argmnt_stat[NUCLEARITY], a_rsttree1, a_rsttree2)
+        _update_nuclearity_stat(a_argmnt_stat[NUCLEARITY], a_txt, a_rsttree1, a_rsttree2, \
+                                    a_diff)
     if a_chck_flags & CHCK_RELATIONS:
-        _update_relations_stat(a_argmnt_stat[RELATIONS], a_rsttree1, a_rsttree2)
+        _update_relations_stat(a_argmnt_stat[RELATIONS], a_txt, a_rsttree1, a_rsttree2, \
+                                   a_diff)
 
-def update_stat(a_src_fname, a_anno1_fname, a_anno2_fname, a_chck_flags, \
-                          a_sgm_strict = True, a_file_fmt = TSV_FMT, a_verbose = True):
+def update_stat(a_src_fname, a_anno1_fname, a_anno2_fname, a_chck_flags, a_diff = False, \
+                    a_sgm_strict = True, a_file_fmt = TSV_FMT, a_verbose = True):
     """
     Measure agreement of two files.
 
@@ -232,6 +275,7 @@ def update_stat(a_src_fname, a_anno1_fname, a_anno2_fname, a_chck_flags, \
     @param a_anno1_fname - name of the 1-st file containing annotation
     @param a_anno2_fname - name of the 2-nd file containing annotation
     @param a_chck_flags - flags specifying which elements should be tested
+    @param a_diff - flag specifying whether differences should be generated
     @param a_sgm_strict - flag indicating whether segment agreement should
                          use strict metric
     @param a_file_fmt - format of annotation file
@@ -273,9 +317,8 @@ def update_stat(a_src_fname, a_anno1_fname, a_anno2_fname, a_chck_flags, \
             skip = True
         if skip:
             continue
-        _update_stat(agrmt_stat, rstForrest1.msgid2tree[msg_id], \
-                         rstForrest2.msgid2tree[msg_id], a_chck_flags, \
-                         a_sgm_strict)
+        _update_stat(agrmt_stat, messages[msg_id], rstForrest1.msgid2tree[msg_id], \
+                         rstForrest2.msgid2tree[msg_id], a_chck_flags, a_diff, a_sgm_strict)
     if a_verbose:
         output_stat(sys.stdout, agrmt_stat, "Statistics on file {:s}".format(a_src_fname))
     _merge_stat(KAPPA_STAT, agrmt_stat)
@@ -357,7 +400,7 @@ to measure the agreement""", choices = [SEGMENTS, NUCLEARITY, RELATIONS, ALL],
             continue
 
         # measure agreement for the given annotation files
-        update_stat(src_fname, anno1_fname, anno2_fname, chck_flags, \
+        update_stat(src_fname, anno1_fname, anno2_fname, chck_flags, args.output_difference, \
                         args.segment_strict, args.file_format, args.verbose)
     output_stat()
     return 0
