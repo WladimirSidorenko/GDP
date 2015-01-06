@@ -144,16 +144,15 @@ class RSTTree(object):
 
         @return list of descendant terminal trees
         """
-        if self._terminal:
-            return [self]
-
         ret = []
+        if self._terminal:
+            ret.append(self)
         if a_flag & TREE_INTERNAL:
             for ch in self.ichildren:
                 ret += ch.get_edus(a_flag)
         ret.sort(key = lambda edu: edu.start)
         if a_flag & TREE_EXTERNAL:
-            for ch in self.ichildren:
+            for ch in self.echildren:
                 ret += ch.get_edus(a_flag)
         return ret
 
@@ -171,6 +170,14 @@ class RSTTree(object):
         if _OFFSETS in a_attrs and a_attrs[_OFFSETS] is not None:
             if len(a_attrs[_OFFSETS]) == 2:
                 self.start, self.end = [int(ofs) for ofs in a_attrs[_OFFSETS]]
+                assert "text" in a_attrs, \
+                    "Text attribute not specified for terminal node {:s}.".format(self.msgid or "")
+                text = a_attrs["text"]
+                t_len = len(text)
+                delta_start = t_len - len(text.lstrip())
+                delta_end = t_len - len(text.rstrip())
+                self.start += delta_start
+                self.end -= delta_end
             elif a_attrs[_OFFSETS]:
                 raise RSTBadFormat("Bad offset format:" + VALUE_SEP.join(a_attrs[_OFFSETS]))
             a_attrs.pop(_OFFSETS, None)

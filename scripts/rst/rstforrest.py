@@ -18,6 +18,8 @@ from constants import ENCODING, LIST_SEP, FIELD_SEP, VALUE_SEP, \
 from exceptions import RSTBadFormat, RSTBadStructure
 from rsttree import RSTTree
 
+import sys
+
 ##################################################################
 # Class
 class RSTForrest(object):
@@ -267,6 +269,8 @@ Different relation types specified for common inter-tweet node {:s} and its chil
                 children.add(self._nid2tree[ch_id])
             attrdic[_CHILDREN] = children
         if len(msgids) == 2:
+            if _PARENT in attrdic:
+                print >> sys.stderr, "parent =", attrdic[_PARENT], "msgids =", repr(msgids)
             assert _PARENT not in attrdic, "No parent should be specified for external nodes."
             if inid not in self._nid2tree:
                 self.msgid2tree[msgid] = self._nid2tree[inid] = RSTTree(inid, msgid = msgid, **attrdic)
@@ -314,6 +318,6 @@ Different relation types specified for common inter-tweet node {:s} and its chil
                     self.trees.add(prnt_tree)
             if msgid not in self.msgid2tree:
                 self.msgid2tree[msgid] = prnt_tree or itree
-            itree.update(**attrdic)
+            itree.update(msgid = msgid, **attrdic)
         else:
             raise RSTBadFormat(line)
