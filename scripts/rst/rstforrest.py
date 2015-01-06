@@ -222,7 +222,7 @@ Different relation types specified for common inter-tweet node {:s} and its chil
         """
         Private method for parsing TSV line describing internal node.
 
-        Example of a line which is supposed to be parsed by this method:
+        Example of line which is supposed to be parsed by this method:
         nid	5074	404262465166639104404263018453692416	text73-90	typespan	textwgt915	labelwgt	arrowwgt	spanwgt916	relname	children5070	parent	constituents	visible1	span7390	offsets	xpos355	ypos30	oldindex	newindex	constit	promotion
 
         @param a_fields - line's fields
@@ -288,6 +288,8 @@ Different relation types specified for common inter-tweet node {:s} and its chil
                 elif inid in self._inid2enid and prnt_id != self._inid2enid[inid]:
                     grnd_prnt_id = prnt_id
                     prnt_id = self._inid2enid[inid]
+                    print >> sys.stderr, "inid =", repr(inid)
+                    print >> sys.stderr, "prnt_id =", repr(prnt_id)
                     assert prnt_id in self._nid2tree, \
                         "No tree was created for external node {:s}.".format(prnt_id)
                     prnt_tree = self._nid2tree[prnt_id]

@@ -9,7 +9,7 @@ script_name [OPTIONS] src_dir anno_dir1 anno_dir2
 
 ##################################################################
 # Libraries
-from rst import RSTForrest, FIELD_SEP, TSV_FMT
+from rst import RSTForrest, FIELD_SEP, TSV_FMT, TREE_INTERNAL
 
 from collections import defaultdict
 import argparse
@@ -60,7 +60,7 @@ def _read_anno_file(a_anno_fname, a_rst, a_fmt):
     with open(a_anno_fname) as ifile:
         fields = {}
         for line in ifile:
-            # print >> sys.stderr, "line =", repr(line)
+            print >> sys.stderr, "line =", repr(line)
             line = line.strip()
             a_rst.parse_line(line.decode(ENCODING), a_fmt)
 
@@ -107,7 +107,7 @@ def _compute_kappa(a_overlap, a_mrkbl1, a_mrkbl2, a_total):
     chance1 = float(a_mrkbl1) / a_total
     chance2 = float(a_mrkbl2) / a_total
     chance = chance1 * chance2 + (1.0 - chance1) * (1.0 - chance2)
-    assert chance <= 1.0, "Invalid value of chance agreement: '{:.2f}'".format(kappa)
+    assert chance < 1.0, "Invalid value of chance agreement: '{:.2f}'".format(kappa)
     # compute Cohen's Kappa
     if chance < 1.0:
         kappa = (agreement - chance) / (1.0 - chance)
@@ -145,18 +145,18 @@ def output_stat(a_ostream = sys.stderr, a_stat = KAPPA_STAT, a_header = ""):
                 print "#\t" + elname
                 print d.encode(ENCODING)
 
-def _generate_segment_diff(a_txt, a_bndr1, a_bndr2):
+def _generate_segment_diff(a_msgid, a_txt, a_bndr1, a_bndr2):
     """
     Generate difference on segments.
 
+    @param a_msgid - id of the message to be annnotated
     @param a_txt - raw text of the trees
     @param a_bndr1 - set of discourse boundaries from the 1-st annotator
     @param a_bndr2 - set of discourse boundaries from the 2-nd annotator
 
     @return string representing boundary differencies
-
     """
-    ret = ""
+    ret = a_msgid + '\t'
     boundaries = [(b, "<1>") for b in a_bndr1 - a_bndr2]
     boundaries += [(b, "<2>") for b in a_bndr2 - a_bndr1]
     boundaries += [(b, "<>") for b in a_bndr1 & a_bndr2]
@@ -167,31 +167,31 @@ def _generate_segment_diff(a_txt, a_bndr1, a_bndr2):
         prev_b = b
     return ret
 
-def _update_segment_stat(a_argmnt_stat, a_txt, a_rsttree1, a_rsttree2, a_diff = False, \
+def _update_segment_stat(a_argmnt_stat, a_rsttree1, a_rsttree2, a_msgid, a_txt, a_diff = False, \
                              a_strict = False):
     """
     Update agreement statistics about segment boundaries.
 
     @param a_argmnt_stat - list containing relevant agreement statistics
-    @param a_txt - raw text of the trees
     @param a_rsttree1 - RST tree from 1-st annotation
     @param a_rsttree2 - RST tree from 2-nd annotation
+    @param a_msgid - id of the message to be annnotated
+    @param a_txt - raw text of the trees
     @param a_diff - generate differences
     @param a_strict - apply strict comparison metric
 
     @return \c void
-
     """
     # print >> sys.stderr, "msgid = ", a_rsttree1.msgid
     # print >> sys.stderr, "a_rsttree1 = ", unicode(a_rsttree1)
     # update counters of EDU boundaries
-    edus1 = a_rsttree1.get_edus()
+    edus1 = a_rsttree1.get_edus(TREE_INTERNAL)
     bndr1 = set([edu.end for edu in edus1])
     bcnt1 = len(bndr1)
     # print >> sys.stderr, "edus1 = ", repr(edus1)
     # print >> sys.stderr, "bndr1 = ", repr(bndr1)
     a_argmnt_stat[MRKBL1_IDX] += bcnt1
-    edus2 = a_rsttree2.get_edus()
+    edus2 = a_rsttree2.get_edus(TREE_INTERNAL)
     bndr2 = set([edu.end for edu in edus2])
     bcnt2 = len(bndr2)
     # print >> sys.stderr, "leaves2 = ", repr(a_rsttree2.get_edus())
@@ -207,31 +207,34 @@ def _update_segment_stat(a_argmnt_stat, a_txt, a_rsttree1, a_rsttree2, a_diff = 
         a_argmnt_stat[TOTAL_IDX] += sum([len(e.text.split()) for e in edus1])
 
     if a_diff and (agrmnt_cnt != bcnt1 or agrmnt_cnt != bcnt2):
-        a_argmnt_stat[DIFF_IDX].append(_generate_segment_diff(a_txt, bndr1, bndr2))
+        a_argmnt_stat[DIFF_IDX].append(_generate_segment_diff(a_msgid, a_txt, bndr1, bndr2))
 
-def _update_nuclearity_stat(a_argmnt_stat, a_txt, a_rsttree1, a_rsttree2, a_diff = False):
+def _update_nuclearity_stat(a_argmnt_stat, a_rsttree1, a_rsttree2, a_msgid, a_txt, \
+                                a_diff = False):
     """
     Update agreement statistics about nuclearity status of EDUs.
 
     @param a_argmnt_stat - list containing relevant agreement statistics
-    @param a_txt - raw text of the trees
     @param a_rsttree1 - RST tree from 1-st annotation
     @param a_rsttree2 - RST tree from 1-st annotation
+    @param a_msgid - id of the message to be annnotated
+    @param a_txt - raw text of the trees
     @param a_diff - flag specifying whether differences should be generated
 
     @return \c void
-
     """
-    pass
+    subtrees1 = a_rsttree1.get_subtrees(TREE_INTERNAL)
 
-def _update_relations_stat(a_argmnt_stat, a_txt, a_rsttree1, a_rsttree2, a_diff = False):
+def _update_relations_stat(a_argmnt_stat, a_rsttree1, a_rsttree2, a_msgid, a_txt, \
+                               a_diff = False):
     """
     Update agreement statistics about relation types between EDUs.
 
     @param a_argmnt_stat - list containing relevant agreement statistics
-    @param a_txt - raw text of the trees
     @param a_rsttree1 - RST tree from 1-st annotation
     @param a_rsttree2 - RST tree from 1-st annotation
+    @param a_msgid - id of the message to be annnotated
+    @param a_txt - raw text of the trees
     @param a_diff - flag specifying whether differences should be generated
 
     @return \c void
@@ -253,15 +256,16 @@ def _update_relations_stat(a_argmnt_stat, a_txt, a_rsttree1, a_rsttree2, a_diff 
                     diff_str += u"\nvs\n" + unicode(a_rsttree2.parent)
                     a_argmnt_stat[DIFF_IDX].append(diff_str)
 
-def _update_stat(a_argmnt_stat, a_txt, a_rsttree1, a_rsttree2, a_chck_flags, \
+def _update_stat(a_argmnt_stat, a_rsttree1, a_rsttree2, a_msgid, a_txt, a_chck_flags, \
                      a_diff, a_sgm_strict):
     """
     Measure agreement of two RST trees.
 
     @param a_argmnt_stat - dictionary with agreement statistics to be updated
-    @param a_txt - raw text of the trees
     @param a_rsttree1 - RST tree from 1-st annotation
     @param a_rsttree2 - RST tree from 2-nd annotation
+    @param a_msgid - id of the message to be annnotated
+    @param a_txt - raw text of the trees
     @param a_chck_flags - flags specifying which elements should be tested
     @param a_diff - flag specifying whether differences should be generated
     @param a_sgm_strict - flag indicating whether segment agreement should
@@ -271,13 +275,13 @@ def _update_stat(a_argmnt_stat, a_txt, a_rsttree1, a_rsttree2, a_chck_flags, \
 
     """
     if a_chck_flags & CHCK_SEGMENTS:
-        _update_segment_stat(a_argmnt_stat[SEGMENTS], a_txt, a_rsttree1, a_rsttree2, \
+        _update_segment_stat(a_argmnt_stat[SEGMENTS], a_rsttree1, a_rsttree2, a_msgid, a_txt, \
                                       a_diff, a_sgm_strict)
     if a_chck_flags & CHCK_NUCLEARITY:
-        _update_nuclearity_stat(a_argmnt_stat[NUCLEARITY], a_txt, a_rsttree1, a_rsttree2, \
+        _update_nuclearity_stat(a_argmnt_stat[NUCLEARITY], a_rsttree1, a_rsttree2, a_msgid, a_txt, \
                                     a_diff)
     if a_chck_flags & CHCK_RELATIONS:
-        _update_relations_stat(a_argmnt_stat[RELATIONS], a_txt, a_rsttree1, a_rsttree2, \
+        _update_relations_stat(a_argmnt_stat[RELATIONS], a_rsttree1, a_rsttree2, a_msgid, a_txt, \
                                    a_diff)
 
 def update_stat(a_src_fname, a_anno1_fname, a_anno2_fname, a_chck_flags, a_diff = False, \
@@ -331,8 +335,8 @@ def update_stat(a_src_fname, a_anno1_fname, a_anno2_fname, a_chck_flags, a_diff 
             skip = True
         if skip:
             continue
-        _update_stat(agrmt_stat, messages[msg_id], rstForrest1.msgid2tree[msg_id], \
-                         rstForrest2.msgid2tree[msg_id], a_chck_flags, a_diff, a_sgm_strict)
+        _update_stat(agrmt_stat, rstForrest1.msgid2tree[msg_id], rstForrest2.msgid2tree[msg_id], \
+                         messages[msg_id], msg_id, a_chck_flags, a_diff, a_sgm_strict)
     if a_verbose:
         output_stat(sys.stdout, agrmt_stat, "Statistics on file {:s}".format(a_src_fname))
     _merge_stat(KAPPA_STAT, agrmt_stat)

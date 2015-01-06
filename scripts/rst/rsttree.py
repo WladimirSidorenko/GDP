@@ -56,6 +56,7 @@ class RSTTree(object):
     Methods:
     add_children - add child trees
     get_edus - return list of descendant terminal trees
+    get_subtrees - return list of descendant subtrees including self
     update - update tree attributes
     """
 
@@ -109,7 +110,8 @@ class RSTTree(object):
         ret += u" (type " + self._escape_text(self.type or "") + ")"
         if self.relname:
             ret += u" (relname " + self._escape_text(self.relname) + ")"
-        if self._terminal:
+        if self._terminal or self.type == "text":
+            self._terminal = True
             ret += u" (start " + unicode(self.start) + ")"
             ret += u" (end " + unicode(self.end) + ")"
             ret += u" (text " + self._escape_text(self.text) + ")"
@@ -147,6 +149,9 @@ class RSTTree(object):
         ret = []
         if self._terminal:
             ret.append(self)
+        elif self.type == "text":
+            self._terminal = True
+            ret.append(self)
         if a_flag & TREE_INTERNAL:
             for ch in self.ichildren:
                 ret += ch.get_edus(a_flag)
@@ -154,6 +159,32 @@ class RSTTree(object):
         if a_flag & TREE_EXTERNAL:
             for ch in self.echildren:
                 ret += ch.get_edus(a_flag)
+        return ret
+
+    def get_subtrees(self, a_flag = TREE_INTERNAL):
+        """
+        Return list of descendant subtrees including self.
+
+        @param a_flag - (optional) flag indicating which descendants (internal
+                        or external, or both) should be processed
+
+        @return list of tuples representing the start/end position of
+        descendant trees along with the trees themselves (present tree will
+        also be included)
+        """
+        ret = []
+        if a_flag & TREE_INTERNAL:
+            for ch in self.ichildren:
+                ret += ch.get_subtrees(a_flag)
+        # calculate offsets based on descendant nodes:
+        if ret:
+            ret.sort()
+            self.start = ret[0][0]
+            self.end = ret[-1][1]
+        ret.append((self.start, self.end, self))
+        if a_flag & TREE_EXTERNAL:
+            for ch in self.echildren:
+                ret += ch.get_subtrees(a_flag)
         return ret
 
     def update(self, **a_attrs):
