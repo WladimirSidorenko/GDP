@@ -11,13 +11,12 @@ RSTForrest - container class comprising several RST trees
 
 ##################################################################
 # Imports
-from constants import LIST_SEP, FIELD_SEP, VALUE_SEP, CHILDREN, \
-    ENCODING, INT_NID, EXT_NID, TSV_FMT, LSP_FMT, PC3_FMT
+from constants import ENCODING, LIST_SEP, FIELD_SEP, VALUE_SEP, \
+    TSV_FMT, LSP_FMT, PC3_FMT, _INT_NID, _EXT_NID, \
+    _PARENT, _CHILDREN, _RELNAME
 
 from exceptions import RSTBadFormat, RSTBadStructure
 from rsttree import RSTTree
-
-import sys
 
 ##################################################################
 # Class
@@ -97,9 +96,9 @@ class RSTForrest(object):
         if not a_line:
             return
         fields = a_line.split(FIELD_SEP)
-        if fields[0] == EXT_NID:
+        if fields[0] == _EXT_NID:
             self._parse_tsv_extnid(fields)
-        elif fields[0] == INT_NID:
+        elif fields[0] == _INT_NID:
             self._parse_tsv_intnid(fields)
         else:
             raise RSTBadFormat(line.encode(ENCODING))
@@ -191,7 +190,7 @@ Different relation types specified for common inter-tweet node {:s} and its chil
             if a_cmn_tree.id == cmn_root:
                 # create a tree for parent node
                 prnt_tree = RSTTree(prnt_root, msgid = prnt_msgid, relname = cmn_prnt_rel, \
-                                        echildren = set([a_chld_tree]))
+                                        parent = a_cmn_tree, echildren = set([a_chld_tree]))
                 self._nid2tree[prnt_root] = prnt_tree
                 a_cmn_tree.ichildren.add(prnt_tree)
             elif a_cmn_tree.id == prnt_root:
@@ -231,6 +230,11 @@ Different relation types specified for common inter-tweet node {:s} and its chil
         self._inid_line_seen = True
         # obtain id of the given node
         inid = a_fields[1]
+        # if the node connects two messages, then check if its id
+        # shouldn't be mapped to something else (TODO: subject to change
+        # after changing RSTTool save format)
+        if inid in self._enid2enid:
+            inid = self._enid2enid[inid]
         # create new tree for referenced message ids, if such tree does not
         # exist already
         msgids = a_fields[2].split(VALUE_SEP)
@@ -246,64 +250,70 @@ Different relation types specified for common inter-tweet node {:s} and its chil
             v = [el for el in f[1:] if el != ""]
             if not v:
                 continue
-            elif len(v) == 1 and f[0] != CHILDREN:
+            elif len(v) == 1 and f[0] != _CHILDREN:
                 attrdic[f[0]] = v[0]
             else:
                 attrdic[f[0]] = v
         # replace children with their respective trees
-        if CHILDREN in attrdic:
+        if _CHILDREN in attrdic:
             children = set([])
-            for ch_id in attrdic[CHILDREN]:
-                if ch_id in self._inid2enid:
+            for ch_id in attrdic[_CHILDREN]:
+                if ch_id in self._inid2enid and self._inid2enid[ch_id] != inid:
                     ch_id = self._inid2enid[ch_id]
-                if ch_id not in self._nid2tree[ch_id]:
+                if ch_id not in self._nid2tree:
+                    # we make no assumption about the belonging of the child
+                    # nodes to any particular message id
                     self._nid2tree[ch_id] = RSTTree(ch_id)
                 children.add(self._nid2tree[ch_id])
-            attrdic[CHILDREN] = children
+            attrdic[_CHILDREN] = children
         if len(msgids) == 2:
+            assert _PARENT not in attrdic, "No parent should be specified for external nodes."
+            if inid not in self._nid2tree:
+                self.msgid2tree[msgid] = self._nid2tree[inid] = RSTTree(inid, msgid = msgid, **attrdic)
+            else:
+                self._nid2tree[inid].update(msgid = msgid, **attrdic)
+        elif len(msgids) == 1:
+            prnt_tree = None
             # correct parent, if necessary
-            if PARENT in attrdic:
+            if _PARENT in attrdic:
                 grnd_prnt_id = None
-                grnd_prnt_tree = prnt_tree = None
-                prnt_id = attrdic[PARENT]
+                grnd_prnt_tree = None
+                prnt_id = attrdic[_PARENT]
                 if prnt_id in self._enid2enid:
                     prnt_id = self._enid2enid[prnt_id]
                 elif inid in self._inid2enid and prnt_id != self._inid2enid[inid]:
                     grnd_prnt_id = prnt_id
                     prnt_id = self._inid2enid[inid]
-                    assert inid in self._nid2tree, "Root node of discussion message is not present in forrest."
-                    assert prnt_id in self._nid2tree, "Abstract root of discussion message is not present in forrest."
-                    assert grnd_prnt_id in self._nid2tree, "External parent of discussion message is not present in forrest."
+                    assert prnt_id in self._nid2tree, \
+                        "No tree was created for external node {:s}.".format(prnt_id)
                     prnt_tree = self._nid2tree[prnt_id]
+                    assert grnd_prnt_id in self._nid2tree, \
+                        "No tree was created for external node {:s}.".format(grnd_prnt_id)
                     grnd_prnt_tree = self._nid2tree[grnd_prnt_id]
                     assert prnt_tree.parent is None or prnt_tree.parent == grnd_prnt_tree, \
                         "Different parents specified for node {:s} ({:s} vs. {:s}).".format( \
-                        prnt_tree.id, prnt_tree.parent.id, grnd_prnt_tree.id)
-                    assert prnt_tree.relname is None or RELNAME in attrdic and \
-                        prnt_tree.relname == attrdic[RELNAME], \
-                        "Different parents specified for node {:s} ({:s} vs. {:s}).".format( \
-                        prnt_tree.id, prnt_tree.relname, attrdic[RELNAME] if RELNAME in attrdic else "")
+                        prnt_id, prnt_tree.parent.id, grnd_prnt_tree.id)
+                    assert prnt_tree.relname is None or _RELNAME in attrdic and \
+                        prnt_tree.relname == attrdic[_RELNAME], \
+                        "Different relations specified for node {:s} ({:s} vs. {:s}).".format( \
+                        prnt_id, prnt_tree.relname, attrdic[_RELNAME] if _RELNAME in attrdic else "")
                     prnt_tree.parent = grnd_prnt_tree
-                    prnt_tree.relname = attrdic.pop(RELNAME, None)
-                if prnt_tree is None and prnt_id not in self._nid2tree:
+                    prnt_tree.relname = attrdic.pop(_RELNAME, None)
+                if prnt_id not in self._nid2tree:
                     prnt_tree = self._nid2tree[prnt_id] = RSTTree(prnt_id)
                 else:
                     prnt_tree = self._nid2tree[prnt_id]
-                attrdic[PARENT] = prnt_tree
-            # if the node connects two messages, then check if its id
-            # shouldn't be mapped to something else (TODO: subject to change
-            # after changing RSTTool save format)
-            if inid in self._enid2enid:
-                inid = self._enid2enid[inid]
-
-            if inid not in self._nid2tree:
-                self.msgid2tree[msgid] = self._nid2tree[inid] = RSTTree(inid, **attrdic)
-            else:
-                self._nid2tree[inid].update(**attrdic)
-        elif len(msgids) == 1:
-            # create tree for the given node, if necessary
+                attrdic[_PARENT] = prnt_tree
+            # create tree for the given node, if needed
             if inid not in self._nid2tree:
                 self._nid2tree[inid] = RSTTree(inid, msgid = msgid)
-            self._nid2tree[inid].update(**attrdic)
+            itree = self._nid2tree[inid]
+            if prnt_tree is not None:
+                if itree in self.trees:
+                    self.trees.discard(itree)
+                    self.trees.add(prnt_tree)
+            if msgid not in self.msgid2tree:
+                self.msgid2tree[msgid] = prnt_tree or itree
+            itree.update(**attrdic)
         else:
             raise RSTBadFormat(line)

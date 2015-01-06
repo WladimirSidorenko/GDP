@@ -6,16 +6,24 @@
 Package for analyzing, constructing, and modifying RST trees.
 
 Constants:
+ENCODING - default encoding used for output (utf-8)
 FIELD_SEP - field separator for TSV format (tab character in other words)
 LIST_SEP - list items separator for TSV format
 VALUE_SEP - attribute-value separator for TSV format
-EXT_NID - string denoting start of description of an external node
-INT_NID - string denoting start of description of an internal node
+TSV_FMT - flag for tab-separated format
+LSP_FMT - flag for s-expression format
+PC3_FMT - flag for PC3 (SGML) format
+TREE_INTERNAL - flag indicating that only internal tree nodes
+          should be processed
+TREE_EXTERNAL - flag indicating that only external tree nodes
+          should be processed
+TREE_ALL - flag indicating that both internal and external tree
+          nodes should be processed
 
 Classes:
 RSTForrest - class for dealing with collections of RST trees
-RSTNode - class representing single RST node
-RSTTree - class for dealing with a single RST tree
+RSTTree - class for dealing with a single RST tree (which can also
+          be just a single node)
 
 Exceptions:
 RSTException - abstract exception used as parent for all RST-related exceptions
@@ -24,24 +32,27 @@ RSTBadStructure - raised when data structure to be read appears to be broken
 
 @author = Uladzimir Sidarenka
 @mail = <sidarenk at uni dash potsdam dot de>
+@version = 0.0.1
 
 """
 
 ##################################################################
 # Imports
 from constants import ENCODING, LIST_SEP, FIELD_SEP, VALUE_SEP, \
-    INT_NID, EXT_NID, TSV_FMT, LSP_FMT, PC3_FMT
+    TSV_FMT, LSP_FMT, PC3_FMT, TREE_INTERNAL, TREE_EXTERNAL, \
+    TREE_ALL
+
 from exceptions import RSTException, RSTBadFormat, RSTBadStructure
 
 from rstforrest import RSTForrest
-from rstnode import RSTNode
 from rsttree import RSTTree
 
 ##################################################################
 # Intialization
 __all__ = ["ENCODING", "LIST_SEP", "FIELD_SEP", "VALUE_SEP", \
-               "INT_NID", "EXT_NID", "TSV_FMT", "LSP_FMT", "PC3_FMT", \
-               "RSTForrest", "RSTTree", "RSTNode", \
+               "TSV_FMT", "LSP_FMT", "PC3_FMT", \
+               "TREE_INTERNAL", "TREE_EXTERNAL", "TREE_ALL", \
+               "RSTForrest", "RSTTree", \
                "RSTException", "RSTBadFormat", "RSTBadStructure"]
 __author__ = "Uladzimir Sidarenka"
 __email__ = "sidarenk at uni dash potsdam dot de"

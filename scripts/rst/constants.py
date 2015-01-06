@@ -6,15 +6,20 @@ LIST_SEP = ','
 FIELD_SEP = '\t'
 VALUE_SEP = '\034'
 
-# node identificators used in TSV format
-INT_NID = "nid"
-EXT_NID = "msgs2extnid"
-OFFSETS = "offsets"
-CHILDREN = "children"
-PARENT = "parent"
-RELNAME = "relname"
-
 # output formats
 TSV_FMT = 1
 LSP_FMT = 2
 PC3_FMT = 4
+
+# flags indicating internal or external children of trees should be returned
+TREE_INTERNAL = 1
+TREE_EXTERNAL = 2
+TREE_ALL = 3
+
+# node identificators used in TSV format
+_INT_NID = "nid"
+_EXT_NID = "msgs2extnid"
+_OFFSETS = "offsets"
+_CHILDREN = "children"
+_PARENT = "parent"
+_RELNAME = "relname"

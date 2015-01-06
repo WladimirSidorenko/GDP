@@ -60,7 +60,7 @@ def _read_anno_file(a_anno_fname, a_rst, a_fmt):
     with open(a_anno_fname) as ifile:
         fields = {}
         for line in ifile:
-            print >> sys.stderr, "line =", repr(line)
+            # print >> sys.stderr, "line =", repr(line)
             line = line.strip()
             a_rst.parse_line(line.decode(ENCODING), a_fmt)
 
@@ -150,13 +150,13 @@ def update_segment_stat(a_argmnt_stat, a_rsttree1, a_rsttree2, \
 
     """
     # update counters of EDU boundaries
-    bndr1 = set([edu.end for edu in a_rsttree1.leaves])
-    print >> sys.stderr, "leaves1 = ", repr(a_rsttree1.leaves)
-    print >> sys.stderr, "bndr1 = ", repr(bndr1)
+    bndr1 = set([edu.end for edu in a_rsttree1.get_edus()])
+    # print >> sys.stderr, "leaves1 = ", repr(a_rsttree1.get_edus())
+    # print >> sys.stderr, "bndr1 = ", repr(bndr1)
     a_argmnt_stat[MRKBL1_IDX] += len(bndr1)
-    bndr2 = set([edu.end for edu in a_rsttree2.leaves])
-    print >> sys.stderr, "leaves2 = ", repr(a_rsttree2.leaves)
-    print >> sys.stderr, "bndr2 = ", repr(bndr2)
+    bndr2 = set([edu.end for edu in a_rsttree2.get_edus()])
+    # print >> sys.stderr, "leaves2 = ", repr(a_rsttree2.get_edus())
+    # print >> sys.stderr, "bndr2 = ", repr(bndr2)
     a_argmnt_stat[MRKBL2_IDX] += len(bndr2)
     a_argmnt_stat[OVERLAP_IDX] += len(bndr1 & bndr2)
     # the total number of possible EDU boundaries will depend on particular
@@ -164,7 +164,7 @@ def update_segment_stat(a_argmnt_stat, a_rsttree1, a_rsttree2, \
     if a_sgm_strict:
         a_argmnt_stat[TOTAL_IDX] += len(bndr1.union(bndr2))
     else:
-        for edu in a_rsttree1.leaves:
+        for edu in a_rsttree1.get_edus():
             a_argmnt_stat[TOTAL_IDX] += len(edu.text.split())
 
 def update_nuclearity_stat(a_argmnt_stat, a_rsttree1, a_rsttree2):
@@ -208,7 +208,7 @@ def _update_stat(a_argmnt_stat, a_rsttree1, a_rsttree2, a_chck_flags, \
     @return \c void
 
     """
-    print >> sys.stderr, "a_rsttree1 = ", a_rsttree1
+    # print >> sys.stderr, "a_rsttree1 = ", a_rsttree1
     if a_chck_flags & CHCK_SEGMENTS:
         update_segment_stat(a_argmnt_stat[SEGMENTS], a_rsttree1, a_rsttree2, \
                                       a_sgm_strict)

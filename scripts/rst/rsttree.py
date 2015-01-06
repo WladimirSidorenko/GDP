@@ -12,11 +12,17 @@ EXT_REL_PRFX - prefix of external relations
 Class:
 RSTTree - class representing single RST tree
 
+@author = Uladzimir Sidarenka
+@mail = <sidarenk at uni dash potsdam dot de>
+@version = 0.0.1
+
 """
+
 ##################################################################
 # Imports
 from constants import ENCODING, LIST_SEP, FIELD_SEP, VALUE_SEP, \
-    CHILDREN, OFFSETS, EXT_NID, INT_NID, TSV_FMT, LSP_FMT, PC3_FMT
+    TSV_FMT, LSP_FMT, PC3_FMT, TREE_INTERNAL, TREE_EXTERNAL, TREE_ALL, \
+    _CHILDREN, _OFFSETS
 from exceptions import RSTBadFormat, RSTBadStructure
 
 import re
@@ -46,10 +52,10 @@ class RSTTree(object):
     start - start offset of the text (for terminal trees)
     end - end offset of the text (for terminal trees)
     text - actual text of terminal tree (for terminal trees)
-    terminal - flag indicating whether this tree is a terminal node
 
     Methods:
     add_children - add child trees
+    get_edus - return list of descendant terminal trees
     update - update tree attributes
     """
 
@@ -70,7 +76,7 @@ class RSTTree(object):
         self.end = -1
         self.start = -1
         self.text = ""
-        self.terminal = False
+        self._terminal = False
         self._nestedness = 0          # nestedness level of this tree (used in print function)
         self.update(**a_attrs)
 
@@ -97,22 +103,21 @@ class RSTTree(object):
         @return unicode representation of the tree
         """
         ret = u'\t' * self._nestedness
-        ret += u"(" + self.id + ' '
-        if self.parent is None or self.parent.msgid != self.msgid:
-            ostr += u"(msgid " + self.msgid + ") "
-        ostr += u"(type " + self.type + ") "
+        ret += u"(" + self.id
+        if self.msgid is not None and (self.parent is None or self.parent.msgid != self.msgid):
+            ret += u" (msgid " + self._escape_text(self.msgid) + ")"
+        ret += u" (type " + self._escape_text(self.type) + ")"
         if self.relname:
-            ostr += u"(relname " + self.relname + ") "
-        if self.terminal:
-            ostr += u"(start " + unicode(self.start) + ") "
-            ostr += u"(end " + unicode(self.start) + ") "
-            ostr += u"(text " + self._escape_text(self.text) + ") "
-
+            ret += u" (relname " + self._escape_text(self.relname) + ")"
+        if self._terminal:
+            ret += u" (start " + unicode(self.start) + ")"
+            ret += u" (end " + unicode(self.end) + ")"
+            ret += u" (text " + self._escape_text(self.text) + ")"
         # append internal nodes to the output
-        ostr += self._unicode_children(self.ichildren)
+        ret += self._unicode_children(self.ichildren)
         # append external nodes to the output
-        ostr += self._unicode_children(self.echildren)
-        ostr += u")"
+        ret += self._unicode_children(self.echildren)
+        ret += u")"
         return ret
 
     def add_children(self, *a_children):
@@ -124,11 +129,33 @@ class RSTTree(object):
         @return pointer to this tree
         """
         for ch in a_children:
-            if ch.msgid == self.msgid:
+            if ch.msgid is None or ch.msgid == self.msgid:
                 self.ichildren.add(ch)
             else:
                 self.echildren.add(ch)
         return self
+
+    def get_edus(self, a_flag = TREE_INTERNAL):
+        """
+        Return list of descendant terminal trees in sorted order.
+
+        @param a_flag - (optional) flag indicating which descendants (internal
+                        or external, or both) should be processed
+
+        @return list of descendant terminal trees
+        """
+        if self._terminal:
+            return [self]
+
+        ret = []
+        if a_flag & TREE_INTERNAL:
+            for ch in self.ichildren:
+                ret += ch.get_edus(a_flag)
+        ret.sort(key = lambda edu: edu.start)
+        if a_flag & TREE_EXTERNAL:
+            for ch in self.ichildren:
+                ret += ch.get_edus(a_flag)
+        return ret
 
     def update(self, **a_attrs):
         """
@@ -138,23 +165,26 @@ class RSTTree(object):
 
         @return \c void
         """
-        if OFFSETS in a_attrs and a_attrs[OFFSETS] is not None:
-            if len(a_attrs[OFFSETS]) == 2:
-                self.start, self.end = a_attrs[OFFSETS]
-            elif a_attrs[OFFSETS]:
-                raise RSTBadFormat("Bad offset format:" + VALUE_SEP.join(a_attrs[OFFSETS]))
-            a_attrs.pop(OFFSETS, None)
+        if "msgid" in a_attrs:
+            self.msgid = a_attrs.pop("msgid")
 
-        if CHILDREN in a_attrs:
-            self.add_children(*a_attrs[CHILDREN])
-            a_attrs.pop(CHILDREN, None)
+        if _OFFSETS in a_attrs and a_attrs[_OFFSETS] is not None:
+            if len(a_attrs[_OFFSETS]) == 2:
+                self.start, self.end = [int(ofs) for ofs in a_attrs[_OFFSETS]]
+            elif a_attrs[_OFFSETS]:
+                raise RSTBadFormat("Bad offset format:" + VALUE_SEP.join(a_attrs[_OFFSETS]))
+            a_attrs.pop(_OFFSETS, None)
+
+        if _CHILDREN in a_attrs:
+            self.add_children(*a_attrs[_CHILDREN])
+            a_attrs.pop(_CHILDREN, None)
 
         for k, v in a_attrs.iteritems():
             if hasattr(self, k):
                 setattr(self, k, v)
 
-        if self.text and self.type == "text":
-            self.terminal = True
+        if self.type == "text":
+            self._terminal = True
 
     def _escape_text(self, a_text):
         """
@@ -174,9 +204,12 @@ class RSTTree(object):
 
         @return unicode string representing children
         """
-        ostr = u""
+        ret = u""
+        orig_nestedness = 0
+        chld_nestedness = self._nestedness + 1
         for ch_tree in a_children:
-            if ch_tree._nestedness == 0:
-                ch_tree._nestedness += 1
-            ostr += '\n' + unicode(ch_tree)
-        return ostr
+            orig_nestedness = ch_tree._nestedness
+            ch_tree._nestedness = chld_nestedness
+            ret += '\n' + unicode(ch_tree)
+            ch_tree._nestedness = orig_nestedness
+        return ret
