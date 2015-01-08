@@ -60,6 +60,7 @@ class RSTTree(object):
     unicode_min - return minimal unicode representation of the given tree
     str_min - return minimal string representation of the given tree
     update - update attributes of the given tree
+
     """
 
     def __init__(self, a_id, **a_attrs):
@@ -118,7 +119,8 @@ class RSTTree(object):
         ret += u" (type " + self._escape_text(self.type or "") + ")"
         if self.relname:
             ret += u" (relname " + self._escape_text(self.relname) + ")"
-        if self._terminal:
+        if self._terminal or self.type == "text":
+            self._terminal = True
             ret += u" (start " + unicode(self.start) + ")"
             ret += u" (end " + unicode(self.end) + ")"
             ret += u" (text " + self._escape_text(self.text) + ")"
@@ -209,6 +211,9 @@ class RSTTree(object):
         """
         ret = []
         if self._terminal:
+            ret.append(self)
+        elif self.type == "text":
+            self._terminal = True
             ret.append(self)
         if a_flag & TREE_INTERNAL:
             for ch in self.ichildren:

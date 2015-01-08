@@ -60,7 +60,7 @@ def _read_anno_file(a_anno_fname, a_rst, a_fmt):
     with open(a_anno_fname) as ifile:
         fields = {}
         for line in ifile:
-            # print >> sys.stderr, "line =", repr(line)
+            print >> sys.stderr, "line =", repr(line)
             line = line.strip()
             a_rst.parse_line(line.decode(ENCODING), a_fmt)
 
@@ -102,7 +102,6 @@ def _compute_kappa(a_overlap, a_mrkbl1, a_mrkbl2, a_total):
     chance1 = float(a_mrkbl1) / a_total
     chance2 = float(a_mrkbl2) / a_total
     chance = chance1 * chance2 + (1.0 - chance1) * (1.0 - chance2)
-    assert chance <= 1.0, "Invalid value of chance agreement: '{:.2f}'".format(kappa)
     # compute Cohen's Kappa
     if chance < 1.0:
         kappa = (agreement - chance) / (1.0 - chance)
@@ -150,9 +149,8 @@ def _update_segment_diff(a_diff, a_txt, a_bndr1, a_bndr2):
     @param a_bndr2 - set of discourse boundaries from the 2-nd annotator
 
     @return \c True if difference was generated, False otherwise
-
     """
-    ret = ""
+    ret = a_msgid + '\t'
     boundaries = [(b, "<1>") for b in a_bndr1 - a_bndr2]
     boundaries += [(b, "<2>") for b in a_bndr2 - a_bndr1]
     if not boundaries:
@@ -180,7 +178,6 @@ def _update_segment_stat(a_argmnt_stat, a_txt, a_edus1, a_edus2, a_diff = False,
     @param a_strict - apply strict comparison metric
 
     @return \c void
-
     """
     # update counters of EDU boundaries
     bndr1 = set([edu.end for edu in a_edus1])
@@ -193,6 +190,7 @@ def _update_segment_stat(a_argmnt_stat, a_txt, a_edus1, a_edus2, a_diff = False,
     if a_strict:
         a_argmnt_stat[TOTAL_IDX] += len(bndr1.union(bndr2))
     else:
+        # print >> sys.stderr, "a_txt =", repr(a_txt)
         a_argmnt_stat[TOTAL_IDX] += len(a_txt.split())
 
     if a_diff:
@@ -215,6 +213,7 @@ def _update_attr_stat(a_argmnt_stat, a_attr, a_subsegs, a_segs2trees1, a_segs2tr
     """
     tree1 = tree2 = None
     print >> sys.stderr, "_update_attr_stat: a_attr =", repr(a_attr)
+    print >> sys.stderr, "_update_attr_stat: a_subsegs =", repr(a_subsegs)
     print >> sys.stderr, "_update_attr_stat: a_segs2trees1 =", repr(a_segs2trees1)
     print >> sys.stderr, "_update_attr_stat: a_segs2trees2 =", repr(a_segs2trees2)
     a_argmnt_stat[MRKBL1_IDX] += len(a_subsegs)
@@ -232,25 +231,28 @@ def _update_attr_stat(a_argmnt_stat, a_attr, a_subsegs, a_segs2trees1, a_segs2tr
         elif not tree2:
             pass
         elif getattr(tree1, a_attr) == getattr(tree2, a_attr):
-            print >> sys.stderr, "_update_attr_stat: tree1.attr =", getattr(tree1, a_attr)
-            print >> sys.stderr, "_update_attr_stat: tree2.attr =", getattr(tree2, a_attr)
+            print >> sys.stderr, "_update_attr_stat: (sim) tree1.attr =", getattr(tree1, a_attr)
+            print >> sys.stderr, "_update_attr_stat: (sim) tree2.attr =", getattr(tree2, a_attr)
             a_argmnt_stat[OVERLAP_IDX] += 1
         else:
+            print >> sys.stderr, "_update_attr_stat: (diff) tree1.attr =", getattr(tree1, a_attr)
+            print >> sys.stderr, "_update_attr_stat: (diff) tree2.attr =", getattr(tree2, a_attr)
             # the number of these differences will be smaller than
             if a_diff:
                 a_argmnt_stat[DIFF_IDX].append(tree1.minimal_str(TREE_INTERNAL, a_attr) + \
                                                    "\nvs.\n" + tree2.minimal_str(TREE_INTERNAL, a_attr))
 
 
-def _update_stat(a_argmnt_stat, a_txt, a_rsttree1, a_rsttree2, a_chck_flags, \
+def _update_stat(a_argmnt_stat, a_rsttree1, a_rsttree2, a_msgid, a_txt, a_chck_flags, \
                      a_diff, a_sgm_strict):
     """
     Measure agreement of two RST trees.
 
     @param a_argmnt_stat - dictionary with agreement statistics to be updated
-    @param a_txt - raw text of the trees
     @param a_rsttree1 - RST tree from 1-st annotation
     @param a_rsttree2 - RST tree from 2-nd annotation
+    @param a_msgid - id of the message to be annnotated
+    @param a_txt - raw text of the trees
     @param a_chck_flags - flags specifying which elements should be tested
     @param a_diff - flag specifying whether differences should be generated
     @param a_sgm_strict - flag indicating whether segment agreement should
@@ -274,10 +276,13 @@ def _update_stat(a_argmnt_stat, a_txt, a_rsttree1, a_rsttree2, a_chck_flags, \
         # generate all possible subsegments
         j_start = 0
         for start_i in starts:
-            while j_start < len(ends) and ends[j_start] > start_i:
+            assert start_i >= 0, "Invalid start of RSTTree: {:d}".format(start_i)
+            while j_start < len(ends) and ends[j_start] < start_i:
                 j_start += 1
             for end_j in ends[j_start:]:
+                assert end_j >= 0, "Invalid start of RSTTree: {:d}".format(end_j)
                 subsegs.append((start_i, end_j))
+    print >> sys.stderr, "subsegs = ", repr(subsegs)
     segs2trees1 = defaultdict(lambda: None, [((t.start, t.end), t) for t in a_rsttree1.get_subtrees()])
     segs2trees2 = defaultdict(lambda: None, [((t.start, t.end), t) for t in a_rsttree2.get_subtrees()])
 
@@ -339,8 +344,8 @@ def update_stat(a_src_fname, a_anno1_fname, a_anno2_fname, a_chck_flags, a_diff 
             skip = True
         if skip:
             continue
-        _update_stat(agrmt_stat, messages[msg_id], rstForrest1.msgid2tree[msg_id], \
-                         rstForrest2.msgid2tree[msg_id], a_chck_flags, a_diff, a_sgm_strict)
+        _update_stat(agrmt_stat, rstForrest1.msgid2tree[msg_id], rstForrest2.msgid2tree[msg_id], \
+                         msg_id, messages[msg_id], a_chck_flags, a_diff, a_sgm_strict)
     if a_verbose:
         output_stat(sys.stdout, agrmt_stat, "Statistics on file {:s}".format(a_src_fname))
     _merge_stat(KAPPA_STAT, agrmt_stat)
