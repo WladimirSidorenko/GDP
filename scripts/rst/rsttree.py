@@ -1,6 +1,5 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 
-##################################################################
 """
 Module providing RSTTree class.
 
@@ -22,7 +21,7 @@ RSTTree - class representing single RST tree
 # Imports
 from constants import ENCODING, LIST_SEP, FIELD_SEP, VALUE_SEP, \
     TSV_FMT, LSP_FMT, PC3_FMT, TREE_INTERNAL, TREE_EXTERNAL, TREE_ALL, \
-    _CHILDREN, _OFFSETS
+    NUC_RELS, _CHILDREN, _TEXT, _OFFSETS
 from exceptions import RSTBadFormat, RSTBadStructure
 
 import re
@@ -56,7 +55,11 @@ class RSTTree(object):
     Methods:
     add_children - add child trees
     get_edus - return list of descendant terminal trees
-    update - update tree attributes
+    get_subtrees - return list of all descendants (by default, only internal
+             subtrees are returned)
+    unicode_min - return minimal unicode representation of the given tree
+    str_min - return minimal string representation of the given tree
+    update - update attributes of the given tree
     """
 
     def __init__(self, a_id, **a_attrs):
@@ -72,13 +75,16 @@ class RSTTree(object):
         self.relname = None
         self.echildren = set()
         self.ichildren = set()
+        self.nucleus = False
         self.type = None
         self.end = -1
         self.start = -1
         self.text = ""
         self._terminal = False
-        self._nestedness = 0          # nestedness level of this tree (used in print function)
+        # nestedness level of this tree (used in print function)
+        self._nestedness = 0
         self.update(**a_attrs)
+        self._update_parent()
 
     def __cmp__(self, a_other):
         """
@@ -88,7 +94,10 @@ class RSTTree(object):
 
         @return \c integer lesser than, equal to, or greater than 0
         """
-        return cmp(self.start, a_other.start)
+        ret = cmp(self.start, a_other.start)
+        if ret == 0:
+            return cmp(self.end, a_other.end)
+        return ret
 
     def __str__(self):
         """Produce string representation of the tree.
@@ -120,6 +129,55 @@ class RSTTree(object):
         ret += u")"
         return ret
 
+    def str_min(self, a_flag = TREE_INTERNAL, *a_attrs):
+        """
+        Return minimal string representation of the given tree.
+
+        @param a_attrs - attributes that should be printed for trees
+
+        @return minimal unicode representation
+        """
+        return self.unicode_min(a_flag, a_attrs).encode(ENCODING)
+
+    def unicode_min(self, a_flag = TREE_INTERNAL, *a_attrs):
+        """
+        Return minimal unicode representation of the given tree.
+
+        @param a_attrs - attributes that should be printed for trees
+
+        @return minimal unicode representation
+        """
+        ret = u'\t' * self._nestedness
+        ret += u"("
+        if self._nestedness < 2:
+            ret += self.id
+            if self._nestedness == 2:
+                avalue = None
+                for attr in a_attrs:
+                    avalue = getattr(attr, None)
+                    if avalue is not None:
+                        ret += " (" + attr + ' ' + avalue + ')'
+        if self._terminal:
+            ret += u" (text " + self._escape_text(self.text) + ")"
+        else:
+            ret += u"..."
+
+        orig_nestedness = 0
+        chld_nestedness = self._nestedness + 1
+        if a_flag & TREE_INTERNAL:
+            for ch in self.ichildren():
+                orig_nestedness = ch_tree._nestedness
+                ch_tree._nestedness = chld_nestedness
+                ret += '\n' + ch_tree.unicode_min()
+                ch_tree._nestedness = orig_nestedness
+        if a_flag & TREE_EXTERNAL:
+            for ch in self.echildren():
+                orig_nestedness = ch_tree._nestedness
+                ch_tree._nestedness = chld_nestedness
+                ret += '\n' + ch_tree.unicode_min()
+                ch_tree._nestedness = orig_nestedness
+        return ret
+
     def add_children(self, *a_children):
         """
         Add new child tree.
@@ -130,9 +188,14 @@ class RSTTree(object):
         """
         for ch in a_children:
             if ch.msgid is None or ch.msgid == self.msgid:
+                if self.start < 0 or ch.start < self.start:
+                    self.start = ch.start
+                if self.end < 0 or ch.end > self.end:
+                    self.end = ch.end
                 self.ichildren.add(ch)
             else:
                 self.echildren.add(ch)
+        self._update_parent()
         return self
 
     def get_edus(self, a_flag = TREE_INTERNAL):
@@ -140,7 +203,7 @@ class RSTTree(object):
         Return list of descendant terminal trees in sorted order.
 
         @param a_flag - (optional) flag indicating which descendants (internal
-                        or external, or both) should be processed
+                        or external, or both) should be returned
 
         @return list of descendant terminal trees
         """
@@ -154,6 +217,26 @@ class RSTTree(object):
         if a_flag & TREE_EXTERNAL:
             for ch in self.echildren:
                 ret += ch.get_edus(a_flag)
+        return ret
+
+    def get_subtrees(self, a_flag = TREE_INTERNAL):
+        """
+        Return list of descendant trees in sorted order.
+
+        @param a_flag - (optional) flag indicating which descendants (internal
+                        or external, or both) should be returned
+
+        @return list of descendant trees
+        """
+        ret = []
+        ret.append(self)
+        if a_flag & TREE_INTERNAL:
+            for ch in self.ichildren:
+                ret += ch.get_subtrees(a_flag)
+        ret.sort()
+        if a_flag & TREE_EXTERNAL:
+            for ch in self.echildren:
+                ret += ch.get_subtrees(a_flag)
         return ret
 
     def update(self, **a_attrs):
@@ -170,9 +253,9 @@ class RSTTree(object):
         if _OFFSETS in a_attrs and a_attrs[_OFFSETS] is not None:
             if len(a_attrs[_OFFSETS]) == 2:
                 self.start, self.end = [int(ofs) for ofs in a_attrs[_OFFSETS]]
-                assert "text" in a_attrs, \
+                assert _TEXT in a_attrs, \
                     "Text attribute not specified for terminal node {:s}.".format(self.msgid or "")
-                text = a_attrs["text"]
+                text = a_attrs[_TEXT]
                 t_len = len(text)
                 delta_start = t_len - len(text.lstrip())
                 delta_end = t_len - len(text.rstrip())
@@ -190,8 +273,11 @@ class RSTTree(object):
             if hasattr(self, k):
                 setattr(self, k, v)
 
-        if self.type == "text":
+        if self.type == _TEXT:
             self._terminal = True
+
+        if self.relname in NUC_RELS:
+            self.nucleus = True
 
     def _escape_text(self, a_text):
         """
@@ -202,6 +288,23 @@ class RSTTree(object):
         @return text with escaped brackets
         """
         return '"' + QUOTE.sub(ESCAPED, a_text) + '"'
+
+    def _update_parent(self):
+        """
+        Update parent's start and end attributes if necessary.
+
+        @return \c void
+        """
+        if self.parent is None or self.parent.msgid != self.msgid:
+            return
+
+        if self.start >= 0 and self.parent.start > self.start:
+            self.parent.start = self.start
+
+        if self.end >= 0 and self.parent.end < self.end:
+            self.parent.end = self.end
+
+        self.parent._update_parent()
 
     def _unicode_children(self, a_children):
         """

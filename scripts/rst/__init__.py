@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 
 ##################################################################
 # Documentation
@@ -19,6 +19,7 @@ TREE_EXTERNAL - flag indicating that only external tree nodes
           should be processed
 TREE_ALL - flag indicating that both internal and external tree
           nodes should be processed
+NUC_RELS - set of relations that can go out from a nucleus node
 
 Classes:
 RSTForrest - class for dealing with collections of RST trees
@@ -40,7 +41,7 @@ RSTBadStructure - raised when data structure to be read appears to be broken
 # Imports
 from constants import ENCODING, LIST_SEP, FIELD_SEP, VALUE_SEP, \
     TSV_FMT, LSP_FMT, PC3_FMT, TREE_INTERNAL, TREE_EXTERNAL, \
-    TREE_ALL
+    TREE_ALL, NUC_RELS
 
 from exceptions import RSTException, RSTBadFormat, RSTBadStructure
 
@@ -51,7 +52,7 @@ from rsttree import RSTTree
 # Intialization
 __all__ = ["ENCODING", "LIST_SEP", "FIELD_SEP", "VALUE_SEP", \
                "TSV_FMT", "LSP_FMT", "PC3_FMT", \
-               "TREE_INTERNAL", "TREE_EXTERNAL", "TREE_ALL", \
+               "TREE_INTERNAL", "TREE_EXTERNAL", "TREE_ALL", "NUC_RELS", \
                "RSTForrest", "RSTTree", \
                "RSTException", "RSTBadFormat", "RSTBadStructure"]
 __author__ = "Uladzimir Sidarenka"

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 
 """
 Script for measuring agreeement on RST corpus.
@@ -9,7 +9,7 @@ script_name [OPTIONS] src_dir anno_dir1 anno_dir2
 
 ##################################################################
 # Libraries
-from rst import RSTForrest, FIELD_SEP, TSV_FMT
+from rst import RSTForrest, FIELD_SEP, TREE_INTERNAL, TSV_FMT
 
 from collections import defaultdict
 import argparse
@@ -89,11 +89,6 @@ def _compute_kappa(a_overlap, a_mrkbl1, a_mrkbl2, a_total):
 
     @return float
     """
-    # print >> sys.stderr, "a_overlap1 = ", a_overlap1
-    # print >> sys.stderr, "a_total1 = ", a_total1
-    # print >> sys.stderr, "a_overlap2 = ", a_overlap2
-    # print >> sys.stderr, "a_total2 = ", a_total2
-    # print >> sys.stderr, "a_total_tkns =", a_total_tkns
     assert a_overlap <= a_mrkbl1, \
         "The numer of matched annotation in the 1-st file exceeds the total number of markables."
     assert a_overlap <= a_mrkbl2, \
@@ -145,113 +140,107 @@ def output_stat(a_ostream = sys.stderr, a_stat = KAPPA_STAT, a_header = ""):
                 print "#\t" + elname
                 print d.encode(ENCODING)
 
-def _generate_segment_diff(a_txt, a_bndr1, a_bndr2):
+def _update_segment_diff(a_diff, a_txt, a_bndr1, a_bndr2):
     """
     Generate difference on segments.
 
+    @param a_diff - list of differences to be updated
     @param a_txt - raw text of the trees
     @param a_bndr1 - set of discourse boundaries from the 1-st annotator
     @param a_bndr2 - set of discourse boundaries from the 2-nd annotator
 
-    @return string representing boundary differencies
+    @return \c True if difference was generated, False otherwise
 
     """
     ret = ""
     boundaries = [(b, "<1>") for b in a_bndr1 - a_bndr2]
     boundaries += [(b, "<2>") for b in a_bndr2 - a_bndr1]
+    if not boundaries:
+        return False
     boundaries += [(b, "<>") for b in a_bndr1 & a_bndr2]
     boundaries.sort(key = lambda el: el[0])
     prev_b = 0
     for b, tag in boundaries:
         ret += a_txt[prev_b:b] + tag
         prev_b = b
-    return ret
+    ret += a_txt[b:]
+    a_diff.append(ret)
+    return True
 
-def _update_segment_stat(a_argmnt_stat, a_txt, a_rsttree1, a_rsttree2, a_diff = False, \
+def _update_segment_stat(a_argmnt_stat, a_txt, a_edus1, a_edus2, a_diff = False, \
                              a_strict = False):
     """
     Update agreement statistics about segment boundaries.
 
     @param a_argmnt_stat - list containing relevant agreement statistics
     @param a_txt - raw text of the trees
-    @param a_rsttree1 - RST tree from 1-st annotation
-    @param a_rsttree2 - RST tree from 2-nd annotation
+    @param a_edus1 - EDUs from the 1-st annotation
+    @param a_edus2 - EDUs from the 2-nd annotation
     @param a_diff - generate differences
     @param a_strict - apply strict comparison metric
 
     @return \c void
 
     """
-    # print >> sys.stderr, "msgid = ", a_rsttree1.msgid
-    # print >> sys.stderr, "a_rsttree1 = ", unicode(a_rsttree1)
     # update counters of EDU boundaries
-    edus1 = a_rsttree1.get_edus()
-    bndr1 = set([edu.end for edu in edus1])
-    bcnt1 = len(bndr1)
-    # print >> sys.stderr, "edus1 = ", repr(edus1)
-    # print >> sys.stderr, "bndr1 = ", repr(bndr1)
-    a_argmnt_stat[MRKBL1_IDX] += bcnt1
-    edus2 = a_rsttree2.get_edus()
-    bndr2 = set([edu.end for edu in edus2])
-    bcnt2 = len(bndr2)
-    # print >> sys.stderr, "leaves2 = ", repr(a_rsttree2.get_edus())
-    # print >> sys.stderr, "bndr2 = ", repr(bndr2)
-    a_argmnt_stat[MRKBL2_IDX] += bcnt2
-    agrmnt_cnt = len(bndr1 & bndr2)
-    a_argmnt_stat[OVERLAP_IDX] += agrmnt_cnt
+    bndr1 = set([edu.end for edu in a_edus1])
+    a_argmnt_stat[MRKBL1_IDX] += len(bndr1)
+    bndr2 = set([edu.end for edu in a_edus2])
+    a_argmnt_stat[MRKBL2_IDX] += len(bndr2)
+    a_argmnt_stat[OVERLAP_IDX] += len(bndr1 & bndr2)
     # the total number of possible EDU boundaries will depend on particular
     # scheme
     if a_strict:
         a_argmnt_stat[TOTAL_IDX] += len(bndr1.union(bndr2))
     else:
-        a_argmnt_stat[TOTAL_IDX] += sum([len(e.text.split()) for e in edus1])
+        a_argmnt_stat[TOTAL_IDX] += len(a_txt.split())
 
-    if a_diff and (agrmnt_cnt != bcnt1 or agrmnt_cnt != bcnt2):
-        a_argmnt_stat[DIFF_IDX].append(_generate_segment_diff(a_txt, bndr1, bndr2))
+    if a_diff:
+        _update_segment_diff(a_argmnt_stat[DIFF_IDX], a_txt, bndr1, bndr2)
 
-def _update_nuclearity_stat(a_argmnt_stat, a_txt, a_rsttree1, a_rsttree2, a_diff = False):
-    """
-    Update agreement statistics about nuclearity status of EDUs.
-
-    @param a_argmnt_stat - list containing relevant agreement statistics
-    @param a_txt - raw text of the trees
-    @param a_rsttree1 - RST tree from 1-st annotation
-    @param a_rsttree2 - RST tree from 1-st annotation
-    @param a_diff - flag specifying whether differences should be generated
-
-    @return \c void
-
-    """
-    pass
-
-def _update_relations_stat(a_argmnt_stat, a_txt, a_rsttree1, a_rsttree2, a_diff = False):
+def _update_attr_stat(a_argmnt_stat, a_attr, a_subsegs, a_segs2trees1, a_segs2trees2, \
+                                a_diff = False):
     """
     Update agreement statistics about relation types between EDUs.
 
     @param a_argmnt_stat - list containing relevant agreement statistics
-    @param a_txt - raw text of the trees
-    @param a_rsttree1 - RST tree from 1-st annotation
-    @param a_rsttree2 - RST tree from 1-st annotation
+    @param a_attr - string representing tree attribute whose agreement should be checked
+    @param a_subsegs - set of all possible subsegments
+    @param a_segs2trees1 - RST trees from the 1-st annotation
+    @param a_segs2trees2 - RST trees from the 2-nd annotation
     @param a_diff - flag specifying whether differences should be generated
 
     @return \c void
 
     """
-    if a_diff:
-        diff_str = u""
-        edus1 = a_rsttree1.get_edus()
-        spans1 = dict([((edu.start, edu.end), edu) for edu in edus1])
-        edus2 = a_rsttree2.get_edus()
-        e1 = key = None
-        for e2 in edus2:
-            key = (e2.start, e2.end)
-            if key in spans1:
-                e1 = spans1[key]
-                if e1.relname != e2.relname:
-                    diff_str = e1.relname + u" ({:s}) vs. ({:s}) ".format(e1.id, e2.id) + e2.relname
-                    diff_str += u"\n" + unicode(a_rsttree1.parent)
-                    diff_str += u"\nvs\n" + unicode(a_rsttree2.parent)
-                    a_argmnt_stat[DIFF_IDX].append(diff_str)
+    tree1 = tree2 = None
+    print >> sys.stderr, "_update_attr_stat: a_attr =", repr(a_attr)
+    print >> sys.stderr, "_update_attr_stat: a_segs2trees1 =", repr(a_segs2trees1)
+    print >> sys.stderr, "_update_attr_stat: a_segs2trees2 =", repr(a_segs2trees2)
+    a_argmnt_stat[MRKBL1_IDX] += len(a_subsegs)
+    a_argmnt_stat[MRKBL2_IDX] += len(a_subsegs)
+    a_argmnt_stat[TOTAL_IDX] += len(a_subsegs)
+    for sseg in a_subsegs:
+        print >> sys.stderr, "_update_attr_stat: sseg =", repr(sseg)
+        tree1 = a_segs2trees1[sseg]
+        tree2 = a_segs2trees2[sseg]
+        print >> sys.stderr, "_update_attr_stat: tree1 =", repr(tree1)
+        print >> sys.stderr, "_update_attr_stat: tree2 =", repr(tree2)
+        if not tree1:
+            if not tree2:
+                a_argmnt_stat[OVERLAP_IDX] += 1
+        elif not tree2:
+            pass
+        elif getattr(tree1, a_attr) == getattr(tree2, a_attr):
+            print >> sys.stderr, "_update_attr_stat: tree1.attr =", getattr(tree1, a_attr)
+            print >> sys.stderr, "_update_attr_stat: tree2.attr =", getattr(tree2, a_attr)
+            a_argmnt_stat[OVERLAP_IDX] += 1
+        else:
+            # the number of these differences will be smaller than
+            if a_diff:
+                a_argmnt_stat[DIFF_IDX].append(tree1.minimal_str(TREE_INTERNAL, a_attr) + \
+                                                   "\nvs.\n" + tree2.minimal_str(TREE_INTERNAL, a_attr))
+
 
 def _update_stat(a_argmnt_stat, a_txt, a_rsttree1, a_rsttree2, a_chck_flags, \
                      a_diff, a_sgm_strict):
@@ -270,14 +259,33 @@ def _update_stat(a_argmnt_stat, a_txt, a_rsttree1, a_rsttree2, a_chck_flags, \
     @return \c void
 
     """
+    edus1 = a_rsttree1.get_edus()
+    edus2 = a_rsttree2.get_edus()
     if a_chck_flags & CHCK_SEGMENTS:
-        _update_segment_stat(a_argmnt_stat[SEGMENTS], a_txt, a_rsttree1, a_rsttree2, \
+        _update_segment_stat(a_argmnt_stat[SEGMENTS], a_txt, edus1, edus2, \
                                       a_diff, a_sgm_strict)
+    subsegs = []
+    if a_chck_flags & (CHCK_NUCLEARITY | CHCK_RELATIONS):
+        # obtain starts and ends of segments
+        starts = list(set([edu.start for edu in edus1] + [edu.start for edu in edus2]))
+        starts.sort()
+        ends = list(set([edu.end for edu in edus1] + [edu.end for edu in edus2]))
+        ends.sort()
+        # generate all possible subsegments
+        j_start = 0
+        for start_i in starts:
+            while j_start < len(ends) and ends[j_start] > start_i:
+                j_start += 1
+            for end_j in ends[j_start:]:
+                subsegs.append((start_i, end_j))
+    segs2trees1 = defaultdict(lambda: None, [((t.start, t.end), t) for t in a_rsttree1.get_subtrees()])
+    segs2trees2 = defaultdict(lambda: None, [((t.start, t.end), t) for t in a_rsttree2.get_subtrees()])
+
     if a_chck_flags & CHCK_NUCLEARITY:
-        _update_nuclearity_stat(a_argmnt_stat[NUCLEARITY], a_txt, a_rsttree1, a_rsttree2, \
+        _update_attr_stat(a_argmnt_stat[NUCLEARITY], "nucleus", subsegs, segs2trees1, segs2trees2, \
                                     a_diff)
     if a_chck_flags & CHCK_RELATIONS:
-        _update_relations_stat(a_argmnt_stat[RELATIONS], a_txt, a_rsttree1, a_rsttree2, \
+        _update_attr_stat(a_argmnt_stat[RELATIONS], "relname", subsegs, segs2trees1, segs2trees2, \
                                    a_diff)
 
 def update_stat(a_src_fname, a_anno1_fname, a_anno2_fname, a_chck_flags, a_diff = False, \

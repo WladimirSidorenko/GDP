@@ -1,6 +1,5 @@
-#!/usr/bin/env python2.7
+#!/usr/bin/env python
 
-##################################################################
 """
 Module providing RSTForrest class.
 
@@ -194,7 +193,7 @@ Different relation types specified for common inter-tweet node {:s} and its chil
                 prnt_tree = RSTTree(prnt_root, msgid = prnt_msgid, relname = cmn_prnt_rel, \
                                         parent = a_cmn_tree, echildren = set([a_chld_tree]))
                 self._nid2tree[prnt_root] = prnt_tree
-                a_cmn_tree.ichildren.add(prnt_tree)
+                a_cmn_tree.add_children(prnt_tree)
             elif a_cmn_tree.id == prnt_root:
                 # if we first saw that the parent message was a child to
                 # another message, we have to re-link the prent of the root
