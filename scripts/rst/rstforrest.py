@@ -34,9 +34,11 @@ class RSTForrest(object):
 
     """
 
-    def __init__(self):
+    def __init__(self, a_fmt = TSV_FMT):
         """
         Class constructor.
+
+        @param a_fmt - format of input data
         """
         self.trees = set()
         self.msgid2tree = {}
@@ -54,6 +56,10 @@ class RSTForrest(object):
         # specifics of current RST Tool save implementation)
         self._inid2enid = {}
         self._inid_line_seen = False
+        if a_fmt == TSV_FMT:
+            self._parse_func = self._parse_tsv
+        else:
+            raise NotImplementedError
 
     def __str__(self):
         """
@@ -71,20 +77,15 @@ class RSTForrest(object):
         """
         return u"\n\n".join([unicode(t) for t in trees.parents])
 
-    def parse_line(self, a_line, a_fmt = TSV_FMT):
+    def parse_line(self, a_line):
         """
         General method for parsing lines with RST forrests.
 
         @param a_line - line to be parsed
-        @param a_fmt - format of input data
 
         @return \c void
         """
-        if a_fmt == TSV_FMT:
-            parse_func = self._parse_tsv
-        else:
-            raise NotImplementedError
-        parse_func(a_line)
+        self._parse_func(a_line)
 
     def _parse_tsv(self, a_line):
         """
@@ -139,7 +140,6 @@ class RSTForrest(object):
         else:
             chld_tree = self._nid2tree[chld_root_id] = self.msgid2tree[chld_msgid] = \
                 RSTTree(chld_root_id, msgid = chld_msgid)
-
         self._join_trees(cmn_tree, chld_tree, nids)
 
     def _join_trees(self, a_cmn_tree, a_chld_tree, a_fields):
@@ -287,8 +287,6 @@ Different relation types specified for common inter-tweet node {:s} and its chil
                 elif inid in self._inid2enid and prnt_id != self._inid2enid[inid]:
                     grnd_prnt_id = prnt_id
                     prnt_id = self._inid2enid[inid]
-                    print >> sys.stderr, "inid =", repr(inid)
-                    print >> sys.stderr, "prnt_id =", repr(prnt_id)
                     assert prnt_id in self._nid2tree, \
                         "No tree was created for external node {:s}.".format(prnt_id)
                     prnt_tree = self._nid2tree[prnt_id]

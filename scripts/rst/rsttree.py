@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-Module providing RSTTree class.
+Module providing class for RSTTree.
 
 Constants:
 DQUOTES - regular expression matching double quotes
@@ -78,14 +78,15 @@ class RSTTree(object):
         self.ichildren = set()
         self.nucleus = False
         self.type = None
-        self.end = -1
         self.start = -1
+        self.end = -1
+        self.t_start = -1        # start position of the whole subtree
+        self.t_end = -1          # end position of the whole subtree
         self.text = ""
         self._terminal = False
         # nestedness level of this tree (used in print function)
         self._nestedness = 0
         self.update(**a_attrs)
-        self._update_parent()
 
     def __cmp__(self, a_other):
         """
@@ -95,9 +96,11 @@ class RSTTree(object):
 
         @return \c integer lesser than, equal to, or greater than 0
         """
-        ret = cmp(self.start, a_other.start)
+        # print >> sys.stderr, repr(self)
+        # print >> sys.stderr, repr(a_other)
+        ret = cmp(self.t_start, a_other.t_start)
         if ret == 0:
-            return cmp(self.end, a_other.end)
+            return cmp(self.t_end, a_other.t_end)
         return ret
 
     def __str__(self):
@@ -119,7 +122,7 @@ class RSTTree(object):
         ret += u" (type " + self._escape_text(self.type or "") + ")"
         if self.relname:
             ret += u" (relname " + self._escape_text(self.relname) + ")"
-        if self._terminal or self.type == "text":
+        if self._terminal or self.start >= 0:
             self._terminal = True
             ret += u" (start " + unicode(self.start) + ")"
             ret += u" (end " + unicode(self.end) + ")"
@@ -188,16 +191,20 @@ class RSTTree(object):
 
         @return pointer to this tree
         """
+        changed = False
         for ch in a_children:
             if ch.msgid is None or ch.msgid == self.msgid:
-                if self.start < 0 or ch.start < self.start:
-                    self.start = ch.start
-                if self.end < 0 or ch.end > self.end:
-                    self.end = ch.end
+                if ch.t_start >= 0 and (self.t_start < 0 or ch.t_start < self.t_start):
+                    changed = True
+                    self.t_start = ch.t_start
+                if ch.t_end >= 0 and (self.t_end < 0 or ch.t_end > self.t_end):
+                    changed = True
+                    self.t_end = ch.t_end
                 self.ichildren.add(ch)
             else:
                 self.echildren.add(ch)
-        self._update_parent()
+        if changed:
+            self._update_parent()
         return self
 
     def get_edus(self, a_flag = TREE_INTERNAL):
@@ -210,11 +217,13 @@ class RSTTree(object):
         @return list of descendant terminal trees
         """
         ret = []
+
         if self._terminal:
             ret.append(self)
-        elif self.type == "text":
+        elif self.start >= 0:
             self._terminal = True
             ret.append(self)
+
         if a_flag & TREE_INTERNAL:
             for ch in self.ichildren:
                 ret += ch.get_edus(a_flag)
@@ -256,16 +265,23 @@ class RSTTree(object):
             self.msgid = a_attrs.pop("msgid")
 
         if _OFFSETS in a_attrs and a_attrs[_OFFSETS] is not None:
+            # print >> sys.stderr, "offsets =", repr(a_attrs[_OFFSETS])
             if len(a_attrs[_OFFSETS]) == 2:
                 self.start, self.end = [int(ofs) for ofs in a_attrs[_OFFSETS]]
+                # print >> sys.stderr, "0) self.start =", self.start
+                # print >> sys.stderr, "0) self.end =", self.end
                 assert _TEXT in a_attrs, \
                     "Text attribute not specified for terminal node {:s}.".format(self.msgid or "")
                 text = a_attrs[_TEXT]
                 t_len = len(text)
-                delta_start = t_len - len(text.lstrip())
-                delta_end = t_len - len(text.rstrip())
-                self.start += delta_start
-                self.end -= delta_end
+                deltat_start = t_len - len(text.lstrip())
+                deltat_end = t_len - len(text.rstrip())
+                # print >> sys.stderr, "0) delta.start =", deltat_start
+                # print >> sys.stderr, "0) delta.end =", deltat_end
+                self.start += deltat_start
+                self.end -= deltat_end
+                self.t_start = self.start; self.t_end = self.end
+                a_attrs[_TEXT] = text.strip()
             elif a_attrs[_OFFSETS]:
                 raise RSTBadFormat("Bad offset format:" + VALUE_SEP.join(a_attrs[_OFFSETS]))
             a_attrs.pop(_OFFSETS, None)
@@ -273,6 +289,8 @@ class RSTTree(object):
         if _CHILDREN in a_attrs:
             self.add_children(*a_attrs[_CHILDREN])
             a_attrs.pop(_CHILDREN, None)
+            # print >> sys.stderr, "1) self.start =", self.start
+            # print >> sys.stderr, "1) self.end =", self.end
 
         for k, v in a_attrs.iteritems():
             if hasattr(self, k):
@@ -283,6 +301,10 @@ class RSTTree(object):
 
         if self.relname in NUC_RELS:
             self.nucleus = True
+
+        self._update_parent()
+        # print >> sys.stderr, "2) self.start =", self.start
+        # print >> sys.stderr, "2) self.end =", self.end
 
     def _escape_text(self, a_text):
         """
@@ -302,14 +324,17 @@ class RSTTree(object):
         """
         if self.parent is None or self.parent.msgid != self.msgid:
             return
+        changed = False
+        if self.t_start >= 0 and (self.parent.t_start < 0 or self.parent.t_start > self.t_start):
+            changed = True
+            self.parent.t_start = self.t_start
 
-        if self.start >= 0 and self.parent.start > self.start:
-            self.parent.start = self.start
+        if self.t_end >= 0 and (self.parent.t_end < 0 or self.parent.t_end < self.t_end):
+            changed = True
+            self.parent.t_end = self.end
 
-        if self.end >= 0 and self.parent.end < self.end:
-            self.parent.end = self.end
-
-        self.parent._update_parent()
+        if changed:
+            self.parent._update_parent()
 
     def _unicode_children(self, a_children):
         """

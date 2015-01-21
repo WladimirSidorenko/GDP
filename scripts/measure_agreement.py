@@ -11,7 +11,7 @@ script_name [OPTIONS] src_dir anno_dir1 anno_dir2
 # Libraries
 from rst import RSTForrest, FIELD_SEP, TREE_INTERNAL, TSV_FMT
 
-from collections import defaultdict
+from collections import defaultdict, Counter
 import argparse
 import glob
 import os
@@ -22,14 +22,14 @@ import sys
 ENCODING = "utf-8"
 
 # indices used for copmputing kappa statistics
-OVERLAP_IDX = 0
-TOTAL_IDX = 1
-MRKBL1_IDX = 2
-MRKBL2_IDX = 3
-DIFF_IDX = 4
+CONFUSION_IDX = 0
+DIFF_IDX = 1
+NONE = "none"
+SEG = "segment"
+NONSEG = "nonsegment"
 
 # auxiliary function used for creating initial statistics list
-KAPPA_GEN = lambda: [0] * 4 + [[]]
+KAPPA_GEN = lambda: [defaultdict(lambda: Counter()), []] # confusion matrix, list of differences
 
 # statistics dictionaries
 KAPPA_STAT = defaultdict(KAPPA_GEN) # total kappa statistics
@@ -46,13 +46,12 @@ CHCK_ALL = 7
 
 ##################################################################
 # Methods
-def _read_anno_file(a_anno_fname, a_rst, a_fmt):
+def _read_anno_file(a_anno_fname, a_rst):
     """
     Read annotation file and update corresponding RST forrest.
 
     @param a_anno_fname - name of the 1-st file containing annotation
     @param a_rst - RST forrest to be populated from given file
-    @param a_fmt - format of input lines
 
     @return \c void
     """
@@ -60,62 +59,65 @@ def _read_anno_file(a_anno_fname, a_rst, a_fmt):
     with open(a_anno_fname) as ifile:
         fields = {}
         for line in ifile:
-            print >> sys.stderr, "line =", repr(line)
+            # print >> sys.stderr, "line =", repr(line)
             line = line.strip()
-            a_rst.parse_line(line.decode(ENCODING), a_fmt)
+            a_rst.parse_line(line.decode(ENCODING))
 
 def _merge_stat(a_trg_stat, a_src_stat):
     """
     Update statistics of a_trg_stat with a_src_stat.
 
-    @param a_trg_stat - target statistics dictionary
-    @param a_src_stat - target statistics dictionary
+    @param a_trg_stat - target statistics to be updated
+    @param a_src_stat - target statistics from which to update
 
     @return void
     """
-    idic = None
-    for key, val in a_src_stat.iteritems():
-        idic = a_trg_stat[key]
-        for i, v in enumerate(val):
-            idic[i] += v
+    confusion1 = confusion2 = stat1 = idic = None
+    for key2, stat2 in a_src_stat.iteritems():
+        stat1 = a_trg_stat[key2]
+        confusion1 = stat1[CONFUSION_IDX]
+        confusion2 = stat2[CONFUSION_IDX]
+        print >> sys.stderr, "confusion1", repr(confusion1)
+        print >> sys.stderr, "confusion2", repr(confusion2)
+        for confusion_key2, confusion_stat2 in confusion2.iteritems():
+            print >> sys.stderr, "confusion1[confusion_key2]", repr(confusion1[confusion_key2])
+            confusion1[confusion_key2].update(confusion_stat2)
+        stat1[DIFF_IDX] += stat2[DIFF_IDX]
 
-def _compute_kappa(a_overlap, a_mrkbl1, a_mrkbl2, a_total):
+def _compute_kappa(a_overlap, a_marginals1, a_marginals2, a_total):
     """Compute Cohen's Kappa.
 
-    @param a_overlap - number of overlapping annotations in the 1-st annotation
-    @param a_mrkbl1  - total number of markables in the 1-st annotation
-    @param a_mrkbl2 - total number of markables in the 2-nd annotation
-    @param a_total - total number of tokens in file
+    @param a_overlap - total number of matches between two annotations
+    @param a_marginals1  - total number of specific markables in the 1-st annotation
+    @param a_marginals2 - total number of specific markables in the 2-nd annotation
+    @param a_total - total number of marked objects
 
     @return float
     """
-    assert a_overlap <= a_mrkbl1, \
-        "The numer of matched annotation in the 1-st file exceeds the total number of markables."
-    assert a_overlap <= a_mrkbl2, \
-        "The numer of matched annotation in the 2-nd file exceeds the total number of markables."
-    # compute chance agreement
+    assert a_overlap <= sum(a_marginals1.values()), \
+        "The numer of matched annotation in the 1-st file exceeds the total number of annotations."
+    assert a_overlap <= sum(a_marginals2.values()), \
+        "The numer of matched annotation in the 2-nd file exceeds the total number of annotations."
     if a_total == 0.0:
         return 0.0
-    agreement = float(a_total - a_mrkbl1 + a_overlap - a_mrkbl2 + a_overlap) / a_total
-    # chances that the first/second annotator randomly annotated a token with
-    # that markable
-    chance1 = float(a_mrkbl1) / a_total
-    chance2 = float(a_mrkbl2) / a_total
-    chance = chance1 * chance2 + (1.0 - chance1) * (1.0 - chance2)
+    # normalize overlap figures
+    observed = float(a_overlap) / float(a_total)
+    # compute chance agreement
+    chance = sum([v * a_marginals2[k] for k, v in a_marginals1.iteritems()]) / float(a_total**2)
     # compute Cohen's Kappa
     if chance < 1.0:
-        kappa = (agreement - chance) / (1.0 - chance)
+        kappa = (observed - chance) / (1.0 - chance)
     else:
         kappa = 0.0
     assert kappa <= 1.0, "Invalid kappa value: '{:.2f}'".format(kappa)
     return kappa
 
-def output_stat(a_ostream = sys.stderr, a_stat = KAPPA_STAT, a_header = ""):
+def output_stat(a_stat = KAPPA_STAT, a_ostream = sys.stderr, a_header = ""):
     """
     Output agreement statistics.
 
-    @param a_ostream - output file stream for statistics
     @param a_stat - dictionary containing agreement statistics
+    @param a_ostream - output file stream for statistics
     @param a_header - optional header to print before actual statistics
 
     @return void
@@ -126,14 +128,29 @@ def output_stat(a_ostream = sys.stderr, a_stat = KAPPA_STAT, a_header = ""):
     print >> a_ostream, \
         "{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}".format("Element", "Overlap", "Markables1", \
                                                           "Markables2", "Total", "Kappa")
+    confusion_mtx = None
+    marginals1 = Counter()
+    marginals2 = Counter()
+    total = _total = overlap = mrkbl1 = mrkbl2 = 0
     for elname, elstat in a_stat.iteritems():
-        overlap = elstat[OVERLAP_IDX]
-        mrkbl1 = elstat[MRKBL1_IDX]
-        mrkbl2 = elstat[MRKBL2_IDX]
-        total = elstat[TOTAL_IDX]
-        kappa = _compute_kappa(overlap, mrkbl1, mrkbl2, total)
+        confusion_mtx = elstat[CONFUSION_IDX]
+        marginals1.clear(); marginals2.clear()
+        total = overlap = mrkbl1 = mrkbl2 = 0
+        for k, v in confusion_mtx.iteritems():
+            overlap += confusion_mtx[k][k]
+            # print >> sys.stderr, "k =", repr(k)
+            # print >> sys.stderr, "v =", repr(v)
+            _total = sum(v.values())
+            total += _total
+            marginals1[k] = _total
+            marginals2.update(v)
+        # print >> sys.stderr, "overlap =", overlap
+        # print >> sys.stderr, "total =", total
+        # print >> sys.stderr, "marginals1 =", repr(marginals1)
+        # print >> sys.stderr, "marginals2 =", repr(marginals2)
+        kappa = _compute_kappa(overlap, marginals1, marginals2, total)
         print >> a_ostream, "{:15s}{:<15d}{:<15d}{:<15d}{:<15d}{:<15.2%}".format(\
-            elname, overlap, mrkbl1, mrkbl2, total, kappa)
+            elname, overlap, sum(marginals1.values()), sum(marginals2.values()), total, kappa)
         if elstat[DIFF_IDX]:
             for d in elstat[DIFF_IDX]:
                 print "#\t" + elname
@@ -179,19 +196,23 @@ def _update_segment_stat(a_argmnt_stat, a_txt, a_edus1, a_edus2, a_diff = False,
 
     @return \c void
     """
-    # update counters of EDU boundaries
+    # update number of total and overlapping segments
     bndr1 = set([edu.end for edu in a_edus1])
-    a_argmnt_stat[MRKBL1_IDX] += len(bndr1)
     bndr2 = set([edu.end for edu in a_edus2])
-    a_argmnt_stat[MRKBL2_IDX] += len(bndr2)
-    a_argmnt_stat[OVERLAP_IDX] += len(bndr1 & bndr2)
-    # the total number of possible EDU boundaries will depend on particular
-    # scheme
-    if a_strict:
-        a_argmnt_stat[TOTAL_IDX] += len(bndr1.union(bndr2))
-    else:
-        # print >> sys.stderr, "a_txt =", repr(a_txt)
-        a_argmnt_stat[TOTAL_IDX] += len(a_txt.split())
+    seg_seg_overlap = len(bndr1 & bndr2)
+    total_seg = len(bndr1 | bndr2)
+
+    # update counters of EDU boundaries
+    confusion_mtx = a_argmnt_stat[CONFUSION_IDX]
+    # print >> sys.stderr, "confusion_mtx[SEG] =", repr(confusion_mtx[SEG])
+    # print >> sys.stderr, "confusion_mtx[SEG][NONSEG] =", repr(confusion_mtx[SEG][NONSEG])
+    confusion_mtx[SEG][NONSEG] += len(bndr1) - seg_seg_overlap
+    confusion_mtx[NONSEG][SEG] += len(bndr2) - seg_seg_overlap
+    confusion_mtx[SEG][SEG] += seg_seg_overlap
+    # The total number of possible EDU boundaries will depend on the particular
+    # scheme.  For strict metric, NONSEG <-> NONSEG is going to be 0.
+    if not a_strict:
+        confusion_mtx[NONSEG][NONSEG] += len(a_txt.split()) - total_seg
 
     if a_diff:
         _update_segment_diff(a_argmnt_stat[DIFF_IDX], a_txt, bndr1, bndr2)
@@ -212,36 +233,47 @@ def _update_attr_stat(a_argmnt_stat, a_attr, a_subsegs, a_segs2trees1, a_segs2tr
 
     """
     tree1 = tree2 = None
+    attr1 = attr2 = None
+    confusion_mtx = a_argmnt_stat[CONFUSION_IDX]
     print >> sys.stderr, "_update_attr_stat: a_attr =", repr(a_attr)
     print >> sys.stderr, "_update_attr_stat: a_subsegs =", repr(a_subsegs)
     print >> sys.stderr, "_update_attr_stat: a_segs2trees1 =", repr(a_segs2trees1)
     print >> sys.stderr, "_update_attr_stat: a_segs2trees2 =", repr(a_segs2trees2)
-    a_argmnt_stat[MRKBL1_IDX] += len(a_subsegs)
-    a_argmnt_stat[MRKBL2_IDX] += len(a_subsegs)
-    a_argmnt_stat[TOTAL_IDX] += len(a_subsegs)
     for sseg in a_subsegs:
-        print >> sys.stderr, "_update_attr_stat: sseg =", repr(sseg)
+        # print >> sys.stderr, "_update_attr_stat: sseg =", repr(sseg)
         tree1 = a_segs2trees1[sseg]
         tree2 = a_segs2trees2[sseg]
-        print >> sys.stderr, "_update_attr_stat: tree1 =", repr(tree1)
-        print >> sys.stderr, "_update_attr_stat: tree2 =", repr(tree2)
+        # print >> sys.stderr, "_update_attr_stat: tree1 =", repr(tree1)
+        # print >> sys.stderr, "_update_attr_stat: tree2 =", repr(tree2)
         if not tree1:
             if not tree2:
-                a_argmnt_stat[OVERLAP_IDX] += 1
+                confusion_mtx[NONE][NONE] += 1
         elif not tree2:
-            pass
-        elif getattr(tree1, a_attr) == getattr(tree2, a_attr):
-            print >> sys.stderr, "_update_attr_stat: (sim) tree1.attr =", getattr(tree1, a_attr)
-            print >> sys.stderr, "_update_attr_stat: (sim) tree2.attr =", getattr(tree2, a_attr)
-            a_argmnt_stat[OVERLAP_IDX] += 1
+            confusion_mtx[getattr(tree1, a_attr)][NONE] += 1
         else:
-            print >> sys.stderr, "_update_attr_stat: (diff) tree1.attr =", getattr(tree1, a_attr)
-            print >> sys.stderr, "_update_attr_stat: (diff) tree2.attr =", getattr(tree2, a_attr)
-            # the number of these differences will be smaller than
-            if a_diff:
+            attr1 = getattr(tree1, a_attr)
+            attr2 = getattr(tree2, a_attr)
+            confusion_mtx[attr1][attr2] += 1
+            if attr1 != attr2 and a_diff:
                 a_argmnt_stat[DIFF_IDX].append(tree1.minimal_str(TREE_INTERNAL, a_attr) + \
-                                                   "\nvs.\n" + tree2.minimal_str(TREE_INTERNAL, a_attr))
+                                                   "\nvs.\n" + tree2.minimal_str(TREE_INTERNAL, \
+                                                                                     a_attr))
 
+def _get_subtrees(a_rsttree):
+    """
+    Obtain all subtrees from a given tree.
+
+    @param a_rsttree - main RST tree to obtain subtrees from
+
+    @return list of 2-tuples with tree offsets and subtrees
+    """
+    ret = []
+    for subtree in a_rsttree.get_subtrees():
+        if subtree.start >= 0:
+            ret.append(((subtree.start, subtree.end), subtree))
+        else:
+            ret.append(((subtree.t_start, subtree.t_end), subtree))
+    return ret
 
 def _update_stat(a_argmnt_stat, a_rsttree1, a_rsttree2, a_msgid, a_txt, a_chck_flags, \
                      a_diff, a_sgm_strict):
@@ -269,29 +301,33 @@ def _update_stat(a_argmnt_stat, a_rsttree1, a_rsttree2, a_msgid, a_txt, a_chck_f
     subsegs = []
     if a_chck_flags & (CHCK_NUCLEARITY | CHCK_RELATIONS):
         # obtain starts and ends of segments
-        starts = list(set([edu.start for edu in edus1] + [edu.start for edu in edus2]))
+        starts = list(set([edu.start for edus in [edus1, edus2] for edu in edus]))
         starts.sort()
-        ends = list(set([edu.end for edu in edus1] + [edu.end for edu in edus2]))
+        ends = list(set(edu.end for edus in [edus1, edus2] for edu in edus))
         ends.sort()
         # generate all possible subsegments
-        j_start = 0
+        j_end = 0
+        print >> sys.stderr, str(a_rsttree1)
+        print >> sys.stderr, str(a_rsttree2)
+        # for each start position, create a list of tuples with this start
+        # position
         for start_i in starts:
             assert start_i >= 0, "Invalid start of RSTTree: {:d}".format(start_i)
-            while j_start < len(ends) and ends[j_start] < start_i:
-                j_start += 1
-            for end_j in ends[j_start:]:
+            while j_end < len(ends) and ends[j_end] <= start_i:
+                j_end += 1
+            for end_j in ends[j_end:]:
                 assert end_j >= 0, "Invalid start of RSTTree: {:d}".format(end_j)
                 subsegs.append((start_i, end_j))
-    print >> sys.stderr, "subsegs = ", repr(subsegs)
-    segs2trees1 = defaultdict(lambda: None, [((t.start, t.end), t) for t in a_rsttree1.get_subtrees()])
-    segs2trees2 = defaultdict(lambda: None, [((t.start, t.end), t) for t in a_rsttree2.get_subtrees()])
+        print >> sys.stderr, "subsegs = ", repr(subsegs)
+        segs2trees1 = defaultdict(lambda: None, _get_subtrees(a_rsttree1))
+        segs2trees2 = defaultdict(lambda: None, _get_subtrees(a_rsttree2))
 
-    if a_chck_flags & CHCK_NUCLEARITY:
-        _update_attr_stat(a_argmnt_stat[NUCLEARITY], "nucleus", subsegs, segs2trees1, segs2trees2, \
-                                    a_diff)
-    if a_chck_flags & CHCK_RELATIONS:
-        _update_attr_stat(a_argmnt_stat[RELATIONS], "relname", subsegs, segs2trees1, segs2trees2, \
-                                   a_diff)
+        if a_chck_flags & CHCK_NUCLEARITY:
+            _update_attr_stat(a_argmnt_stat[NUCLEARITY], "nucleus", subsegs, segs2trees1, \
+                                  segs2trees2, a_diff)
+        if a_chck_flags & CHCK_RELATIONS:
+            _update_attr_stat(a_argmnt_stat[RELATIONS], "relname", subsegs, segs2trees1, \
+                                  segs2trees2, a_diff)
 
 def update_stat(a_src_fname, a_anno1_fname, a_anno2_fname, a_chck_flags, a_diff = False, \
                     a_sgm_strict = True, a_file_fmt = TSV_FMT, a_verbose = True):
@@ -324,11 +360,11 @@ def update_stat(a_src_fname, a_anno1_fname, a_anno2_fname, a_chck_flags, a_diff 
             assert len(fields) == 2, u"Incorrect format: '{:s}'".format(line).encode(ENCODING)
             messages[fields[0]] = fields[1]
     # read first annotation file
-    rstForrest1 = RSTForrest()
-    _read_anno_file(a_anno1_fname, rstForrest1, a_file_fmt)
+    rstForrest1 = RSTForrest(a_file_fmt)
+    _read_anno_file(a_anno1_fname, rstForrest1)
     # read second annotation file
-    rstForrest2 = RSTForrest()
-    _read_anno_file(a_anno2_fname, rstForrest2, a_file_fmt)
+    rstForrest2 = RSTForrest(a_file_fmt)
+    _read_anno_file(a_anno2_fname, rstForrest2)
     # perform neccessary agreement tests
     skip = False
     agrmt_stat = defaultdict(KAPPA_GEN)
@@ -346,8 +382,11 @@ def update_stat(a_src_fname, a_anno1_fname, a_anno2_fname, a_chck_flags, a_diff 
             continue
         _update_stat(agrmt_stat, rstForrest1.msgid2tree[msg_id], rstForrest2.msgid2tree[msg_id], \
                          msg_id, messages[msg_id], a_chck_flags, a_diff, a_sgm_strict)
+        # delete both lines
+        # output_stat(agrmt_stat, sys.stdout, "Statistics on file {:s}".format(a_src_fname))
+        # sys.exit(66)
     if a_verbose:
-        output_stat(sys.stdout, agrmt_stat, "Statistics on file {:s}".format(a_src_fname))
+        output_stat(agrmt_stat, sys.stdout, "Statistics on file {:s}".format(a_src_fname))
     _merge_stat(KAPPA_STAT, agrmt_stat)
 
 def main(argv):
