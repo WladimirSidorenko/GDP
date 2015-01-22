@@ -22,7 +22,7 @@ RSTTree - class representing single RST tree
 from constants import ENCODING, LIST_SEP, FIELD_SEP, VALUE_SEP, \
     TSV_FMT, LSP_FMT, PC3_FMT, TREE_INTERNAL, TREE_EXTERNAL, TREE_ALL, \
     NUC_RELS, _CHILDREN, _TEXT, _OFFSETS
-from exceptions import RSTBadFormat, RSTBadStructure
+from exceptions import RSTBadFormat, RSTBadLogic, RSTBadStructure
 
 import re
 import sys
@@ -87,6 +87,28 @@ class RSTTree(object):
         # nestedness level of this tree (used in print function)
         self._nestedness = 0
         self.update(**a_attrs)
+
+    def __eq__(self, a_other):
+        """
+        Compare given tree with another one and return true if they are the same.
+
+        @param a_other - tree to compare with
+
+        @return true if trees are the same
+        """
+        if not isinstance(a_other, RSTTree):
+            raise RSTBadLogic("Can't compare RST tree with {:s}".format(a_other.__class__.__name__))
+        return id(self) == id(a_other)
+
+    def __ne__(self, a_other):
+        """
+        Compare given tree with another one and return true if they are not same.
+
+        @param a_other - tree to compare with
+
+        @return true if trees are not the same
+        """
+        return not self.__eq__(a_other)
 
     def __cmp__(self, a_other):
         """

@@ -160,7 +160,7 @@ class RSTForrest(object):
         chld_root = a_chld_tree.id
         prnt_msgid, chld_msgid = a_cmn_tree.msgid, a_chld_tree.msgid
 
-        assert a_chld_tree.parent is None or a_chld_tree.parent == prnt_root, \
+        assert a_chld_tree.parent is None or a_chld_tree.parent.id == prnt_root, \
             "Message {:s} is linked to multiple parents".format(chld_msgid)
         assert a_chld_tree.relname is None or a_chld_tree.relname == prnt_chld_rel, \
             "Message {:s} is linked to its parent via different relations: {:s} vs {:s}".format(\
@@ -300,8 +300,8 @@ Different relation types specified for common inter-tweet node {:s} and its chil
                         prnt_tree.relname == attrdic[_RELNAME], \
                         "Different relations specified for node {:s} ({:s} vs. {:s}).".format( \
                         prnt_id, prnt_tree.relname, attrdic[_RELNAME] if _RELNAME in attrdic else "")
-                    prnt_tree.parent = grnd_prnt_tree
                     prnt_tree.relname = attrdic.pop(_RELNAME, None)
+                    prnt_tree.parent = grnd_prnt_tree
                 if prnt_id not in self._nid2tree:
                     prnt_tree = self._nid2tree[prnt_id] = RSTTree(prnt_id)
                 else:
