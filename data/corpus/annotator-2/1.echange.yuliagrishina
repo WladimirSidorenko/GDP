@@ -3,16 +3,14 @@ msgs2extnid	405346120412704768,405357943836909568	50115003span50035010comme
 msgs2extnid	404261789514616832,404261977964687360	506060span605059OTHER
 msgs2extnid	405346120412704768,405437196452106241	50175003span50035016comment-topic
 msgs2extnid	404264047748849664,404264465698287618	50735067span50675072OTHER
-msgs2extnid	404262465166639104,404262718380584960	50815061span50615080r-answer
-msgs2extnid	404263018453692416,404264047748849664	50855083span50835067r-OTHER
 msgs2extnid	405346120412704768,405348205992636416	50205003span50035019comment-topic
 msgs2extnid	405346120412704768,405359023534268416	50075003span50035006comment-topic
 msgs2extnid	405346120412704768,405352107144138752	50145003span50035013comment-topic
 msgs2extnid	404541334905950208,404549622355730432	50305029span50295027r-OTHER
 msgs2extnid	404536249094270976,404550496289300480	50335023span50235032OTHER
-msgs2extnid	404262465166639104,404263018453692416	50845061span50615083r-answer
 msgs2extnid	404264465698287618,404274739948306433	50755072span50725074OTHER
 msgs2extnid	404534340387753985,404536249094270976	502421span215023r-OTHER
+nid	5086	404549622355730432404550287446523904	text28-31	typespan	textwgt380	labelwgt	arrowwgt	spanwgt381	relname	children5027	parent	constituents	visible1	span2831	offsets	xpos327	ypos0	oldindex	newindex	constit	promotion
 nid	5074	404274739948306433	text90-91	typespan	textwgt6145	labelwgt6148	arrowwgt6147	spanwgt6146	relnameOTHER	children91	parent5072	constituents	visible1	span9091	offsets	xpos740	ypos126	oldindex	newindex	constit	promotion
 nid	5003	405346120412704768	text1-76	typespan	textwgt747	labelwgt222	arrowwgt755	spanwgt748	relnamespan	children15010501350165019	parent5020	constituents	visible1	span176	offsets	xpos327	ypos48	oldindex	newindex	constit	promotion
 nid	35	404550287446523904	text@Wundersterne	typetext	textwgt1746	labelwgt1749	arrowwgt1748	spanwgt1747	relnameaddress	children	parent36	constituents	visible1	span3535	offsets013	xpos520	ypos174	oldindex	newindex	constit	promotion
