@@ -34,9 +34,11 @@ class RSTForrest(object):
 
     """
 
-    def __init__(self):
+    def __init__(self, a_fmt = TSV_FMT):
         """
         Class constructor.
+
+        @param a_fmt - format of input data
         """
         self.trees = set()
         self.msgid2tree = {}
@@ -54,6 +56,10 @@ class RSTForrest(object):
         # specifics of current RST Tool save implementation)
         self._inid2enid = {}
         self._inid_line_seen = False
+        if a_fmt == TSV_FMT:
+            self._parse_func = self._parse_tsv
+        else:
+            raise NotImplementedError
 
     def __str__(self):
         """
@@ -71,20 +77,15 @@ class RSTForrest(object):
         """
         return u"\n\n".join([unicode(t) for t in trees.parents])
 
-    def parse_line(self, a_line, a_fmt = TSV_FMT):
+    def parse_line(self, a_line):
         """
         General method for parsing lines with RST forrests.
 
         @param a_line - line to be parsed
-        @param a_fmt - format of input data
 
         @return \c void
         """
-        if a_fmt == TSV_FMT:
-            parse_func = self._parse_tsv
-        else:
-            raise NotImplementedError
-        parse_func(a_line)
+        self._parse_func(a_line)
 
     def _parse_tsv(self, a_line):
         """
@@ -139,7 +140,6 @@ class RSTForrest(object):
         else:
             chld_tree = self._nid2tree[chld_root_id] = self.msgid2tree[chld_msgid] = \
                 RSTTree(chld_root_id, msgid = chld_msgid)
-
         self._join_trees(cmn_tree, chld_tree, nids)
 
     def _join_trees(self, a_cmn_tree, a_chld_tree, a_fields):
@@ -160,7 +160,7 @@ class RSTForrest(object):
         chld_root = a_chld_tree.id
         prnt_msgid, chld_msgid = a_cmn_tree.msgid, a_chld_tree.msgid
 
-        assert a_chld_tree.parent is None or a_chld_tree.parent == prnt_root, \
+        assert a_chld_tree.parent is None or a_chld_tree.parent.id == prnt_root, \
             "Message {:s} is linked to multiple parents".format(chld_msgid)
         assert a_chld_tree.relname is None or a_chld_tree.relname == prnt_chld_rel, \
             "Message {:s} is linked to its parent via different relations: {:s} vs {:s}".format(\
@@ -287,8 +287,6 @@ Different relation types specified for common inter-tweet node {:s} and its chil
                 elif inid in self._inid2enid and prnt_id != self._inid2enid[inid]:
                     grnd_prnt_id = prnt_id
                     prnt_id = self._inid2enid[inid]
-                    print >> sys.stderr, "inid =", repr(inid)
-                    print >> sys.stderr, "prnt_id =", repr(prnt_id)
                     assert prnt_id in self._nid2tree, \
                         "No tree was created for external node {:s}.".format(prnt_id)
                     prnt_tree = self._nid2tree[prnt_id]
@@ -302,8 +300,8 @@ Different relation types specified for common inter-tweet node {:s} and its chil
                         prnt_tree.relname == attrdic[_RELNAME], \
                         "Different relations specified for node {:s} ({:s} vs. {:s}).".format( \
                         prnt_id, prnt_tree.relname, attrdic[_RELNAME] if _RELNAME in attrdic else "")
-                    prnt_tree.parent = grnd_prnt_tree
                     prnt_tree.relname = attrdic.pop(_RELNAME, None)
+                    prnt_tree.parent = grnd_prnt_tree
                 if prnt_id not in self._nid2tree:
                     prnt_tree = self._nid2tree[prnt_id] = RSTTree(prnt_id)
                 else:

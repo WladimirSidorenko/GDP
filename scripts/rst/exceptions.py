@@ -6,8 +6,9 @@ Module providing custom exceptions for RST package.
 
 Exception Classes:
 RSTException - abstract parent class of all RST excpetions
-RSTBadStructure - exception thrown when bad tree structure is encounted
 RSTBadFormat - exception thrown when bad line format is encounted
+RSTBadLogic - exception thrown when illegitimate operation is attempted
+RSTBadStructure - exception thrown when bad tree structure is encounted
 
 """
 
@@ -23,6 +24,27 @@ class RSTException(Exception):
         @param a_msg - line containing error description
         """
         super(RSTException, self).__init__(a_msg)
+
+##################################################################
+class RSTBadLogic(RSTException):
+    """
+    Exception raised when  illegitimate operation is attempted.
+
+    This class subclasses `RSTException` and simply passes its error
+    desciption to its parent class.
+
+    Methods:
+
+    Variables:
+    """
+
+    def __init__(self, a_msg):
+        """
+        Class constructor.
+
+        @param a_line - line containing error description
+        """
+        super(RSTBadLogic, self).__init__(a_msg)
 
 ##################################################################
 class RSTBadStructure(RSTException):

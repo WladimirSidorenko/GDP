@@ -29,6 +29,7 @@ RSTTree - class for dealing with a single RST tree (which can also
 Exceptions:
 RSTException - abstract exception used as parent for all RST-related exceptions
 RSTBadFormat - raised when attempting to parse an incorrect line
+RSTBadLogic - raised when when illegitimate operation is attempted
 RSTBadStructure - raised when data structure to be read appears to be broken
 
 @author = Uladzimir Sidarenka
@@ -43,7 +44,7 @@ from constants import ENCODING, LIST_SEP, FIELD_SEP, VALUE_SEP, \
     TSV_FMT, LSP_FMT, PC3_FMT, TREE_INTERNAL, TREE_EXTERNAL, \
     TREE_ALL, NUC_RELS
 
-from exceptions import RSTException, RSTBadFormat, RSTBadStructure
+from exceptions import RSTException, RSTBadFormat, RSTBadLogic, RSTBadStructure
 
 from rstforrest import RSTForrest
 from rsttree import RSTTree
