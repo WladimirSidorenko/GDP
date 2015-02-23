@@ -1,6 +1,6 @@
 msgs2extnid	327829220246032384,327830343702937600	53045200span52005203r-OTHER
 msgs2extnid	328526539987763202,328527696063758336	52555056span50565061r-correction
-msgs2extnid	318970091771412482,318973883476758528	509781span815096r-answer
+msgs2extnid	318970091771412482,318973883476758528	509781span815265r-answer
 msgs2extnid	319832609712635905,319832946871783425	52535047span50475050r-InfoAnswer
 msgs2extnid	318975442877026304,318976078716760065	51145104span51045113r-Sequence
 msgs2extnid	328526539987763202,328528353076322304	52575056span50565071r-correction
@@ -110,7 +110,7 @@ nid	5046	319832609712635905	text38-39	typemultinuc	textwgt3787	labelwgt	arro
 nid	80	328562091751534592	text hat der Herr Friedrich denn eigentlich ein gültiges Visum für Berlin?	typetext	textwgt4594	labelwgt	arrowwgt4596	spanwgt4595	relnamespan	children5086	parent5087	constituents	visible1	span8080	offsets1686	xpos740	ypos124	oldindex	newindex	constit	promotion
 nid	79	328562091751534592	text @ZDF	typetext	textwgt4605	labelwgt4608	arrowwgt4607	spanwgt4606	relnameList	children	parent5086	constituents	visible1	span7979	offsets1116	xpos630	ypos171	oldindex	newindex	constit	promotion
 nid	5047	319832609712635905	text34-39	typespan	textwgt3784	labelwgt3649	arrowwgt3786	spanwgt3785	relnamespan	children50465050	parent5253	constituents	visible1	span3439	offsets	xpos245	ypos77	oldindex	newindex	constit	promotion
-nid	81	318970091771412482	textNach dem Ostermontag kommt doch der Osterdienstag. Oder?	typetext	textwgt4658	labelwgt	arrowwgt4660	spanwgt4659	relnamespan	children5100	parent5270	constituents	visible1	span8181	offsets056	xpos80	ypos77	oldindex	newindex	constit	promotion
+nid	81	318970091771412482	textNach dem Ostermontag kommt doch der Osterdienstag. Oder?	typetext	textwgt4658	labelwgt	arrowwgt4660	spanwgt4659	relnamespan	children51005265	parent5270	constituents	visible1	span8181	offsets056	xpos80	ypos77	oldindex	newindex	constit	promotion
 nid	5049	319832946871783425	text41-42	typemultinuc	textwgt3806	labelwgt	arrowwgt3808	spanwgt3807	relnamespan	children404142	parent5050	constituents	visible1	span4142	offsets	xpos575	ypos124	oldindex	newindex	constit	promotion
 nid	5050	319832946871783425	text40-42	typespan	textwgt3802	labelwgt3805	arrowwgt3804	spanwgt3803	relnamer-InfoAnswer	children5049	parent5047	constituents	visible1	span4042	offsets	xpos575	ypos77	oldindex	newindex	constit	promotion
 nid	5052	328526539987763202	text44-45	typespan	textwgt4563	labelwgt4566	arrowwgt4565	spanwgt4564	relnameelaboration	children44	parent43	constituents	visible1	span4445	offsets	xpos190	ypos124	oldindex	newindex	constit	promotion

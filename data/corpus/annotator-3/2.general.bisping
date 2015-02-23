@@ -43,7 +43,7 @@ msgs2extnid	323713533755940864,323714235253284864	56475161span51615164r-sug
 msgs2extnid	328261309856632832,328262989784428546	54945491span54915493r-evaluation-s
 msgs2extnid	327430973392310273,327437223567970304	53355330span53305334r-Contrast
 msgs2extnid	319731939198242817,319732150364680195	56155029span50295031r-e-elaboration
-msgs2extnid	327324219887194112,327325280848977920	53735369span53695372r-evaluation-s
+msgs2extnid	327324219887194112,327325280848977920	53735369span53695707r-evaluation-s
 msgs2extnid	322418065780383744,322418492429176832	51005097span50975099r-Contrast
 msgs2extnid	327470287048282113,327502490801147906	57165414span54145419r-InfoAnswer
 msgs2extnid	327112577547128834,327117095399718913	56855286span52865301r-evaluation-s
@@ -110,7 +110,7 @@ msgs2extnid	328094026052018176,328117139720523776	57395463span54635473r-ela
 msgs2extnid	327684382456426496,327701388773699584	57315459span54595461r-evaluation-s
 msgs2extnid	320539932655505408,320540513063297024	505561span615054r-evaluation-s
 msgs2extnid	323708716782338048,323713326179840000	56455158span51585159r-InfoAnswer
-msgs2extnid	327325951803412481,327326325901762562	53785375span53755377r-evaluation-s
+msgs2extnid	327325951803412481,327326325901762562	53785706span57065377r-evaluation-s
 msgs2extnid	323202789520052224,323203403679399936	51365130span51305134r-Contrast
 msgs2extnid	327454279285747712,327455538449354752	53915388span53885390r-OTHER
 msgs2extnid	327326614419542017,327329515586064384	57115380span53805385r-elaboration
@@ -417,12 +417,11 @@ nid	5364	327471259774492672	text395-396	typespan	textwgt15705	labelwgt	arrow
 nid	5365	327471259774492672	text394-396	typespan	textwgt15701	labelwgt15704	arrowwgt15703	spanwgt15702	relnamer-e-elaboration	children5364	parent5362	constituents	visible1	span394396	offsets	xpos520	ypos77	oldindex	newindex	constit	promotion
 nid	5367	327323002532421632	text397-398	typespan	textwgt15878	labelwgt	arrowwgt15886	spanwgt15879	relnamespan	children3985369	parent5703	constituents	visible1	span397398	offsets	xpos190	ypos47	oldindex	newindex	constit	promotion
 nid	5368	327324219887194112	text400-401	typespan	textwgt16498	labelwgt	arrowwgt16500	spanwgt16499	relnamespan	children399400	parent5369	constituents	visible1	span400401	offsets	xpos190	ypos124	oldindex	newindex	constit	promotion
-nid	5369	327324219887194112	text399-401	typespan	textwgt16495	labelwgt15890	arrowwgt16497	spanwgt16496	relnamespan	children53685372	parent5373	constituents	visible1	span399401	offsets	xpos190	ypos77	oldindex	newindex	constit	promotion
+nid	5369	327324219887194112	text399-401	typespan	textwgt16495	labelwgt15890	arrowwgt16497	spanwgt16496	relnamespan	children53685707	parent5373	constituents	visible1	span399401	offsets	xpos190	ypos77	oldindex	newindex	constit	promotion
 nid	5371	327325280848977920	text403-404	typemultinuc	textwgt17089	labelwgt	arrowwgt17091	spanwgt17090	relnamespan	children402403404	parent5707	constituents	visible1	span403404	offsets	xpos245	ypos124	oldindex	newindex	constit	promotion
 nid	5373	327324219887194112327325280848977920	text399-404	typespan	textwgt16493	labelwgt	arrowwgt	spanwgt16494	relname	children5369	parent	constituents	visible1	span399404	offsets	xpos190	ypos30	oldindex	newindex	constit	promotion
-nid	5375	327325951803412481	text5377	typespan	textwgt17672	labelwgt16648	arrowwgt17639	spanwgt17673	relnamespan	children5377	parent5378	constituents	visible1	span53775377	offsets	xpos110	ypos30	oldindex	newindex	constit	promotion
 nid	5377	327326325901762562	text408-409	typespan	textwgt18353	labelwgt17643	arrowwgt18355	spanwgt18354	relnamespan	children4095382	parent5710	constituents	visible1	span408409	offsets	xpos190	ypos77	oldindex	newindex	constit	promotion
-nid	5378	327325951803412481327326325901762562	text405-409	typespan	textwgt17635	labelwgt	arrowwgt	spanwgt17636	relname	children5375	parent	constituents	visible1	span405409	offsets	xpos110	ypos30	oldindex	newindex	constit	promotion
+nid	5378	327325951803412481327326325901762562	text405-409	typespan	textwgt17635	labelwgt	arrowwgt	spanwgt17636	relname	children5706	parent	constituents	visible1	span405409	offsets	xpos110	ypos30	oldindex	newindex	constit	promotion
 nid	5380	327326614419542017	text410-412	typespan	textwgt18380	labelwgt17686	arrowwgt18382	spanwgt18381	relnamespan	children53795385	parent5711	constituents	visible1	span410412	offsets	xpos190	ypos77	oldindex	newindex	constit	promotion
 nid	5379	327326614419542017	text411-412	typespan	textwgt18383	labelwgt	arrowwgt18385	spanwgt18384	relnamespan	children410411	parent5380	constituents	visible1	span411412	offsets	xpos190	ypos124	oldindex	newindex	constit	promotion
 nid	5382	327326624041275392	text413-414	typespan	textwgt18363	labelwgt18366	arrowwgt18365	spanwgt18364	relnamer-elaboration	children414	parent5377	constituents	visible1	span413414	offsets	xpos410	ypos77	oldindex	newindex	constit	promotion
@@ -1038,7 +1037,7 @@ nid	5695	327462674176819200327463076528025601	text368-	typespan	textwgt13125
 nid	98	321962622444527616	text ‏RT @flugzeugcover	typetext	textwgt2231	labelwgt2234	arrowwgt2233	spanwgt2232	relnameattribution	children	parent99	constituents	visible1	span9898	offsets2039	xpos410	ypos218	oldindex	newindex	constit	promotion
 nid	359	327430973392310273	text mein besonderer freund war der nichtschweiger,	typetext	textwgt12288	labelwgt	arrowwgt12290	spanwgt12289	relnamespan	children360	parent5329	constituents	visible1	span359359	offsets956	xpos190	ypos171	oldindex	newindex	constit	promotion
 nid	360	327430973392310273	text hab ihn allerdings schon länger nicht mehr getroffen.	typetext	textwgt12291	labelwgt12294	arrowwgt12293	spanwgt12292	relnameconcession	children	parent359	constituents	visible1	span360360	offsets56110	xpos300	ypos171	oldindex	newindex	constit	promotion
-nid	5706	327325951803412481	text405-407	typespan	textwgt17680	labelwgt17107	arrowwgt17682	spanwgt17681	relnamespan	children53805705	parent5709	constituents	visible1	span405407	offsets	xpos245	ypos77	oldindex	newindex	constit	promotion
+nid	5706	327325951803412481	text405-407	typespan	textwgt17680	labelwgt17107	arrowwgt17682	spanwgt17681	relnamespan	children538053775705	parent5709	constituents	visible1	span405407	offsets	xpos245	ypos77	oldindex	newindex	constit	promotion
 nid	5696	327463076528025601327464148269150209	text369-374	typespan	textwgt13583	labelwgt	arrowwgt	spanwgt13584	relname	children5694	parent	constituents	visible1	span369374	offsets	xpos110	ypos30	oldindex	newindex	constit	promotion
 nid	99	321962622444527616	text #Rassismus: Als schwarzer Mann hat man hier keine Rechte	typetext	textwgt2228	labelwgt5018	arrowwgt2230	spanwgt2229	relnamespan	children98	parent5631	constituents	visible1	span9999	offsets3998	xpos520	ypos218	oldindex	newindex	constit	promotion
 nid	361	327437223567970304	text@_schmecks_ 	typetext	textwgt13080	labelwgt13083	arrowwgt13082	spanwgt13081	relnameat-mention	children	parent5333	constituents	visible1	span361361	offsets012	xpos80	ypos124	oldindex	newindex	constit	promotion
