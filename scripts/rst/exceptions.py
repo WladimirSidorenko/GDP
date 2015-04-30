@@ -23,7 +23,7 @@ class RSTException(Exception):
 
         @param a_msg - line containing error description
         """
-        super(RSTException, self).__init__(a_msg)
+        super(Exception, self).__init__(a_msg)
 
 ##################################################################
 class RSTBadLogic(RSTException):
@@ -44,7 +44,7 @@ class RSTBadLogic(RSTException):
 
         @param a_line - line containing error description
         """
-        super(RSTBadLogic, self).__init__(a_msg)
+        super(RSTException, self).__init__(a_msg)
 
 ##################################################################
 class RSTBadStructure(RSTException):
@@ -65,7 +65,7 @@ class RSTBadStructure(RSTException):
 
         @param a_line - line containing error description
         """
-        super(RSTBadStructure, self).__init__(a_msg)
+        super(RSTException, self).__init__(a_msg)
 
 ##################################################################
 class RSTBadFormat(RSTException):
@@ -80,10 +80,10 @@ class RSTBadFormat(RSTException):
     Variables:
     """
 
-    def __init__(self, a_line):
+    def __init__(self, a_msg):
         """
         Class constructor.
 
-        @param a_line - line containing error description
+        @param a_msg - line containing error description
         """
-        super(RSTBadStructure, self).__init__(a_msg)
+        super(RSTException, self).__init__(a_msg)
