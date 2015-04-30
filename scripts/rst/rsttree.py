@@ -296,14 +296,14 @@ class RSTTree(object):
                     "Text attribute not specified for terminal node {:s}.".format(self.msgid or "")
                 text = a_attrs[_TEXT]
                 t_len = len(text)
-                deltat_start = t_len - len(text.lstrip())
-                deltat_end = t_len - len(text.rstrip())
+                deltat_start = t_len - len(text)
+                deltat_end = t_len - len(text)
                 # print >> sys.stderr, "0) delta.start =", deltat_start
                 # print >> sys.stderr, "0) delta.end =", deltat_end
                 self.start += deltat_start
                 self.end -= deltat_end
                 self.t_start = self.start; self.t_end = self.end
-                a_attrs[_TEXT] = text.strip()
+                a_attrs[_TEXT] = text
             elif a_attrs[_OFFSETS]:
                 raise RSTBadFormat("Bad offset format:" + VALUE_SEP.join(a_attrs[_OFFSETS]))
             a_attrs.pop(_OFFSETS, None)
@@ -353,7 +353,7 @@ class RSTTree(object):
 
         if self.t_end >= 0 and (self.parent.t_end < 0 or self.parent.t_end < self.t_end):
             changed = True
-            self.parent.t_end = self.end
+            self.parent.t_end = self.t_end
 
         if changed:
             self.parent._update_parent()
