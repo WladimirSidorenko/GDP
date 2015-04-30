@@ -75,7 +75,7 @@ class RSTForrest(object):
 
         @return unicode representation of the forrest
         """
-        return u"\n\n".join([unicode(t) for t in trees.parents])
+        return u"\n\n".join([unicode(t) for t in self.trees])
 
     def parse_line(self, a_line):
         """
@@ -103,7 +103,8 @@ class RSTForrest(object):
         elif fields[0] == _INT_NID:
             self._parse_tsv_intnid(fields)
         else:
-            raise RSTBadFormat(line.encode(ENCODING))
+            raise RSTBadFormat(line.encode(ENCODING) + \
+                                   ": fields[0] = '{:s}'".format(fields[0]).encode(ENCODING))
 
     def _parse_tsv_extnid(self, a_fields):
         """
@@ -118,7 +119,6 @@ class RSTForrest(object):
         """
         assert not self._inid_line_seen, \
             "External node specification should preceed description of internal nodes."
-
         cmn_tree = chld_tree = None
         cmn_msgid, chld_msgid = a_fields[1].split(LIST_SEP)
         nids = a_fields[-1].split(VALUE_SEP)
@@ -196,7 +196,7 @@ Different relation types specified for common inter-tweet node {:s} and its chil
                 a_cmn_tree.add_children(prnt_tree)
             elif a_cmn_tree.id == prnt_root:
                 # if we first saw that the parent message was a child to
-                # another message, we have to re-link the prent of the root
+                # another message, we have to re-link the parent of the root
                 # node to the common node
                 prnt_tree = a_cmn_tree
                 cmn_tree = self.msgid2tree[prnt_msgid] = RSTTree(cmn_root, msgid = prnt_msgid, \
