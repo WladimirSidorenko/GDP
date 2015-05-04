@@ -1,1 +1,612 @@
-<annotation><segments><segment end="17" id="62" msgid="404261977964687360" start="9" /><segment end="9" id="61" msgid="404261977964687360" start="0" /><segment end="47" id="63" msgid="404261977964687360" start="17" /><segment end="75" id="82" msgid="404261977964687360" start="47" /><segment end="38" id="97" msgid="404262748294356992" start="9" /><segment end="9" id="96" msgid="404262748294356992" start="0" /><segment end="15" id="68" msgid="404262465166639104" start="0" /><segment end="29" id="69" msgid="404262465166639104" start="15" /><segment end="41" id="70" msgid="404262465166639104" start="29" /><segment end="51" id="71" msgid="404262465166639104" start="41" /><segment end="70" id="72" msgid="404262465166639104" start="51" /><segment end="91" id="73" msgid="404262465166639104" start="70" /><segment end="10" id="75" msgid="404262718380584960" start="0" /><segment end="31" id="98" msgid="404262718380584960" start="10" /><segment end="132" id="99" msgid="404262718380584960" start="31" /><segment end="36" id="94" msgid="404263018453692416" start="9" /><segment end="105" id="95" msgid="404263018453692416" start="36" /><segment end="9" id="93" msgid="404263018453692416" start="0" /><segment end="15" id="74" msgid="404264047748849664" start="0" /><segment end="40" id="83" msgid="404264047748849664" start="15" /><segment end="59" id="84" msgid="404264047748849664" start="40" /><segment end="26" id="86" msgid="404264465698287618" start="9" /><segment end="54" id="87" msgid="404264465698287618" start="26" /><segment end="111" id="88" msgid="404264465698287618" start="54" /><segment end="122" id="89" msgid="404264465698287618" start="111" /><segment end="9" id="85" msgid="404264465698287618" start="0" /><segment end="37" id="91" msgid="404274739948306433" start="16" /><segment end="16" id="90" msgid="404274739948306433" start="0" /><segment end="26" id="86" msgid="404264465698287618" start="9" /><segment end="54" id="87" msgid="404264465698287618" start="26" /><segment end="111" id="88" msgid="404264465698287618" start="54" /><segment end="122" id="89" msgid="404264465698287618" start="111" /><segment end="9" id="85" msgid="404264465698287618" start="0" /><segment end="37" id="91" msgid="404274739948306433" start="16" /><segment end="16" id="90" msgid="404274739948306433" start="0" /><segment end="65" id="60" msgid="404261789514616832" start="0" /><segment end="81" id="92" msgid="404261789514616832" start="64" /><segment end="59" id="19" msgid="405348205992636416" start="11" /><segment end="71" id="20" msgid="405348205992636416" start="59" /><segment end="11" id="18" msgid="405348205992636416" start="0" /><segment end="134" id="16" msgid="405437196452106241" start="9" /><segment end="9" id="15" msgid="405437196452106241" start="0" /><segment end="70" id="13" msgid="405352107144138752" start="9" /><segment end="84" id="14" msgid="405352107144138752" start="70" /><segment end="9" id="12" msgid="405352107144138752" start="0" /><segment end="9" id="8" msgid="405357943836909568" start="0" /><segment end="34" id="9" msgid="405357943836909568" start="9" /><segment end="82" id="10" msgid="405357943836909568" start="34" /><segment end="133" id="11" msgid="405357943836909568" start="82" /><segment end="32" id="1" msgid="405346120412704768" start="0" /><segment end="85" id="2" msgid="405346120412704768" start="32" /><segment end="108" id="3" msgid="405346120412704768" start="85" /><segment end="134" id="76" msgid="405346120412704768" start="108" /><segment end="78" id="5" msgid="405359023534268416" start="10" /><segment end="117" id="6" msgid="405359023534268416" start="78" /><segment end="140" id="7" msgid="405359023534268416" start="117" /><segment end="10" id="4" msgid="405359023534268416" start="0" /><segment end="3" id="44" msgid="405979348450021376" start="0" /><segment end="14" id="45" msgid="405979348450021376" start="3" /><segment end="91" id="46" msgid="405979348450021376" start="14" /><segment end="118" id="78" msgid="405979348450021376" start="91" /><segment end="100" id="40" msgid="405974393664593920" start="0" /><segment end="123" id="41" msgid="405974393664593920" start="100" /><segment end="66" id="50" msgid="405977544282742784" start="30" /><segment end="106" id="51" msgid="405977544282742784" start="66" /><segment end="138" id="79" msgid="405977544282742784" start="106" /><segment end="30" id="49" msgid="405977544282742784" start="14" /><segment end="1" id="47" msgid="405977544282742784" start="0" /><segment end="14" id="48" msgid="405977544282742784" start="1" /><segment end="115" id="77" msgid="405980365963018240" start="13" /><segment end="3" id="42" msgid="405980365963018240" start="0" /><segment end="13" id="43" msgid="405980365963018240" start="3" /><segment end="33" id="57" msgid="405978334124732417" start="14" /><segment end="79" id="58" msgid="405978334124732417" start="33" /><segment end="99" id="59" msgid="405978334124732417" start="79" /><segment end="137" id="81" msgid="405978334124732417" start="99" /><segment end="14" id="56" msgid="405978334124732417" start="3" /><segment end="3" id="55" msgid="405978334124732417" start="0" /><segment end="83" id="54" msgid="405979935694520320" start="14" /><segment end="110" id="80" msgid="405979935694520320" start="83" /><segment end="3" id="52" msgid="405979935694520320" start="0" /><segment end="14" id="53" msgid="405979935694520320" start="3" /><segment end="64" id="21" msgid="404534340387753985" start="0" /><segment end="104" id="24" msgid="404541334905950208" start="40" /><segment end="40" id="23" msgid="404541334905950208" start="13" /><segment end="13" id="22" msgid="404541334905950208" start="0" /><segment end="57" id="29" msgid="404549622355730432" start="8" /><segment end="118" id="31" msgid="404549622355730432" start="57" /><segment end="8" id="28" msgid="404549622355730432" start="0" /><segment end="13" id="35" msgid="404550287446523904" start="0" /><segment end="62" id="37" msgid="404550287446523904" start="13" /><segment end="81" id="38" msgid="404550287446523904" start="62" /><segment end="107" id="39" msgid="404550287446523904" start="81" /><segment end="54" id="34" msgid="404550496289300480" start="15" /><segment end="15" id="32" msgid="404550496289300480" start="0" /><segment end="13" id="25" msgid="404536249094270976" start="0" /><segment end="44" id="26" msgid="404536249094270976" start="13" /><segment end="63" id="27" msgid="404536249094270976" start="44" /></segments><spans><span end="-60" etype="span" external="1" id="-140" msgid="404261789514616832" start="-123" /><span end="92" etype="text" external="1" id="-123" msgid="404261789514616832" start="60" /><span end="-121" etype="span" external="1" id="-122" msgid="404261977964687360" start="-60" /><span end="82" etype="text" external="1" id="-60" msgid="404261977964687360" start="61" /><span end="62" etype="" external="0" id="-58" msgid="404261977964687360" start="61" /><span end="82" etype="" external="0" id="-59" msgid="404261977964687360" start="63" /><span end="-142" etype="span" external="1" id="-148" msgid="404262465166639104" start="-121" /><span end="73" etype="text" external="1" id="-121" msgid="404262465166639104" start="68" /><span end="97" etype="text" external="1" id="-144" msgid="404262748294356992" start="96" /><span end="73" etype="" external="0" id="-119" msgid="404262465166639104" start="69" /><span end="73" etype="" external="0" id="-118" msgid="404262465166639104" start="70" /><span end="73" etype="" external="0" id="-120" msgid="404262465166639104" start="71" /><span end="73" etype="" external="0" id="-117" msgid="404262465166639104" start="72" /><span end="99" etype="text" external="1" id="-147" msgid="404262718380584960" start="75" /><span end="99" etype="" external="0" id="-146" msgid="404262718380584960" start="98" /><span end="-68" etype="span" external="1" id="-149" msgid="404263018453692416" start="-142" /><span end="95" etype="text" external="1" id="-142" msgid="404263018453692416" start="93" /><span end="95" etype="" external="0" id="-141" msgid="404263018453692416" start="94" /><span end="-73" etype="span" external="1" id="-150" msgid="404264047748849664" start="-68" /><span end="84" etype="text" external="1" id="-68" msgid="404264047748849664" start="74" /><span end="84" etype="" external="0" id="-67" msgid="404264047748849664" start="83" /><span end="-75" etype="span" external="1" id="-151" msgid="404264465698287618" start="-73" /><span end="89" etype="text" external="1" id="-73" msgid="404264465698287618" start="85" /><span end="89" etype="" external="0" id="-72" msgid="404264465698287618" start="86" /><span end="88" etype="" external="0" id="-71" msgid="404264465698287618" start="86" /><span end="86" etype="" external="0" id="-69" msgid="404264465698287618" start="86" /><span end="88" etype="" external="0" id="-70" msgid="404264465698287618" start="87" /><span end="91" etype="text" external="1" id="-75" msgid="404274739948306433" start="90" /><span end="-75" etype="span" external="1" id="-151" msgid="404264465698287618" start="-73" /><span end="89" etype="text" external="1" id="-73" msgid="404264465698287618" start="85" /><span end="89" etype="" external="0" id="-72" msgid="404264465698287618" start="86" /><span end="88" etype="" external="0" id="-71" msgid="404264465698287618" start="86" /><span end="86" etype="" external="0" id="-69" msgid="404264465698287618" start="86" /><span end="88" etype="" external="0" id="-70" msgid="404264465698287618" start="87" /><span end="91" etype="text" external="1" id="-75" msgid="404274739948306433" start="90" /><span end="-17" etype="span" external="1" id="-97" msgid="405346120412704768" start="-89" /><span end="76" etype="text" external="1" id="-89" msgid="405346120412704768" start="1" /><span end="20" etype="text" external="1" id="-20" msgid="405348205992636416" start="18" /><span end="20" etype="" external="0" id="-19" msgid="405348205992636416" start="19" /><span end="16" etype="text" external="1" id="-17" msgid="405437196452106241" start="15" /><span end="14" etype="text" external="1" id="-14" msgid="405352107144138752" start="12" /><span end="14" etype="" external="0" id="-13" msgid="405352107144138752" start="13" /><span end="11" etype="text" external="1" id="-11" msgid="405357943836909568" start="8" /><span end="11" etype="" external="0" id="-10" msgid="405357943836909568" start="9" /><span end="11" etype="" external="0" id="-9" msgid="405357943836909568" start="10" /><span end="3" etype="" external="0" id="-88" msgid="405346120412704768" start="1" /><span end="3" etype="" external="0" id="-3" msgid="405346120412704768" start="2" /><span end="7" etype="text" external="1" id="-95" msgid="405359023534268416" start="4" /><span end="7" etype="" external="0" id="-94" msgid="405359023534268416" start="5" /><span end="6" etype="" external="0" id="-5" msgid="405359023534268416" start="5" /><span end="-39" etype="span" external="1" id="-106" msgid="405974393664593920" start="-104" /><span end="41" etype="text" external="1" id="-104" msgid="405974393664593920" start="40" /><span end="78" etype="text" external="1" id="-43" msgid="405979348450021376" start="44" /><span end="78" etype="" external="0" id="-42" msgid="405979348450021376" start="46" /><span end="45" etype="" external="0" id="-41" msgid="405979348450021376" start="44" /><span end="79" etype="text" external="1" id="-110" msgid="405977544282742784" start="47" /><span end="79" etype="" external="0" id="-109" msgid="405977544282742784" start="49" /><span end="79" etype="" external="0" id="-107" msgid="405977544282742784" start="50" /><span end="79" etype="" external="0" id="-108" msgid="405977544282742784" start="51" /><span end="48" etype="" external="0" id="-44" msgid="405977544282742784" start="47" /><span end="77" etype="text" external="1" id="-39" msgid="405980365963018240" start="42" /><span end="43" etype="" external="0" id="-38" msgid="405980365963018240" start="42" /><span end="81" etype="text" external="1" id="-115" msgid="405978334124732417" start="55" /><span end="81" etype="" external="0" id="-113" msgid="405978334124732417" start="57" /><span end="81" etype="" external="0" id="-53" msgid="405978334124732417" start="58" /><span end="81" etype="" external="0" id="-114" msgid="405978334124732417" start="59" /><span end="56" etype="" external="0" id="-56" msgid="405978334124732417" start="55" /><span end="80" etype="text" external="1" id="-125" msgid="405979935694520320" start="52" /><span end="80" etype="" external="0" id="-124" msgid="405979935694520320" start="54" /><span end="53" etype="" external="0" id="-51" msgid="405979935694520320" start="52" /><span end="-30" etype="span" external="1" id="-127" msgid="404534340387753985" start="21" /><span end="-135" etype="span" external="1" id="-136" msgid="404541334905950208" start="-30" /><span end="24" etype="text" external="1" id="-30" msgid="404541334905950208" start="22" /><span end="23" etype="" external="0" id="-29" msgid="404541334905950208" start="22" /><span end="-138" etype="span" external="1" id="-139" msgid="404549622355730432" start="-135" /><span end="31" etype="text" external="1" id="-135" msgid="404549622355730432" start="28" /><span end="31" etype="" external="0" id="-134" msgid="404549622355730432" start="29" /><span end="39" etype="text" external="1" id="-138" msgid="404550287446523904" start="35" /><span end="39" etype="" external="0" id="-137" msgid="404550287446523904" start="37" /><span end="39" etype="" external="0" id="-36" msgid="404550287446523904" start="38" /><span end="-33" etype="span" external="1" id="-130" msgid="404536249094270976" start="-102" /><span end="27" etype="text" external="1" id="-102" msgid="404536249094270976" start="25" /><span end="34" etype="text" external="1" id="-33" msgid="404550496289300480" start="32" /><span end="27" etype="" external="0" id="-101" msgid="404536249094270976" start="26" /></spans><relations><hypRelation relname="r-InfoAnswer"><spannode idref="-140" /><nucleus idref="-123" /><satellite idref="-122" /></hypRelation><hypRelation relname="r-SetQuestion"><spannode idref="-122" /><nucleus idref="-60" /><satellite idref="-148" /></hypRelation><hypRelation relname="evaluation-s"><spannode idref="-60" /><nucleus idref="-58" /><satellite idref="-59" /></hypRelation><hypRelation relname="address"><spannode idref="-58" /><nucleus idref="62" /><satellite idref="61" /></hypRelation><hypRelation relname="antithesis"><spannode idref="-59" /><nucleus idref="63" /><satellite idref="82" /></hypRelation><hypRelation relname="r-InfoAnswer"><spannode idref="-148" /><nucleus idref="-121" /><satellite idref="-144" /></hypRelation><hypRelation relname="r-InfoAnswer"><spannode idref="-148" /><nucleus idref="-121" /><satellite idref="-147" /></hypRelation><hypRelation relname="r-InfoAnswer"><spannode idref="-148" /><nucleus idref="-121" /><satellite idref="-149" /></hypRelation><hypRelation relname="address"><spannode idref="-144" /><nucleus idref="97" /><satellite idref="96" /></hypRelation><hypRelation relname="address"><spannode idref="-121" /><nucleus idref="-119" /><satellite idref="68" /></hypRelation><hypRelation relname="elaboration"><spannode idref="-119" /><nucleus idref="69" /><satellite idref="-118" /></hypRelation><hypRelation relname="elaboration"><spannode idref="-118" /><nucleus idref="70" /><satellite idref="-120" /></hypRelation><hypRelation relname="elaboration"><spannode idref="-120" /><nucleus idref="71" /><satellite idref="-117" /></hypRelation><hypRelation relname="elaboration"><spannode idref="-117" /><nucleus idref="72" /><satellite idref="73" /></hypRelation><hypRelation relname="address"><spannode idref="-147" /><nucleus idref="-146" /><satellite idref="75" /></hypRelation><hypRelation relname="elaboration"><spannode idref="-146" /><nucleus idref="98" /><satellite idref="99" /></hypRelation><hypRelation relname="r-antithesis"><spannode idref="-149" /><nucleus idref="-142" /><satellite idref="-150" /></hypRelation><hypRelation relname="address"><spannode idref="-142" /><nucleus idref="-141" /><satellite idref="93" /></hypRelation><hypRelation relname="elaboration"><spannode idref="-141" /><nucleus idref="94" /><satellite idref="95" /></hypRelation><hypRelation relname="r-Contrast"><spannode idref="-150" /><nucleus idref="-68" /><satellite idref="-151" /></hypRelation><hypRelation relname="address"><spannode idref="-68" /><nucleus idref="-67" /><satellite idref="74" /></hypRelation><hypRelation relname="evaluation-s"><spannode idref="-67" /><nucleus idref="83" /><satellite idref="84" /></hypRelation><hypRelation relname="r-affirmation"><spannode idref="-151" /><nucleus idref="-73" /><satellite idref="-75" /></hypRelation><hypRelation relname="address"><spannode idref="-73" /><nucleus idref="-72" /><satellite idref="85" /></hypRelation><hypRelation relname="OTHER"><spannode idref="-72" /><nucleus idref="-71" /><satellite idref="89" /></hypRelation><hypRelation relname="condition"><spannode idref="-71" /><nucleus idref="-69" /><satellite idref="-70" /></hypRelation><parRelation relname="List"><spannode idref="-70" /><nucleus idref="87" /><nucleus idref="88" /></parRelation><hypRelation relname="address"><spannode idref="-75" /><nucleus idref="91" /><satellite idref="90" /></hypRelation><hypRelation relname="r-affirmation"><spannode idref="-151" /><nucleus idref="-73" /><satellite idref="-75" /></hypRelation><hypRelation relname="address"><spannode idref="-73" /><nucleus idref="-72" /><satellite idref="85" /></hypRelation><hypRelation relname="OTHER"><spannode idref="-72" /><nucleus idref="-71" /><satellite idref="89" /></hypRelation><hypRelation relname="condition"><spannode idref="-71" /><nucleus idref="-69" /><satellite idref="-70" /></hypRelation><hypRelation relname="address"><spannode idref="-75" /><nucleus idref="91" /><satellite idref="90" /></hypRelation><hypRelation relname="address"><spannode idref="-123" /><nucleus idref="60" /><satellite idref="92" /></hypRelation><hypRelation relname="r-solutionhood"><spannode idref="-97" /><nucleus idref="-89" /><satellite idref="-20" /></hypRelation><hypRelation relname="r-YesNoQuestion"><spannode idref="-97" /><nucleus idref="-89" /><satellite idref="-17" /></hypRelation><hypRelation relname="r-suggestion"><spannode idref="-97" /><nucleus idref="-89" /><satellite idref="-14" /></hypRelation><hypRelation relname="r-restatement"><spannode idref="-97" /><nucleus idref="-89" /><satellite idref="-11" /></hypRelation><hypRelation relname="r-evaluation-s"><spannode idref="-97" /><nucleus idref="-89" /><satellite idref="-95" /></hypRelation><hypRelation relname="address"><spannode idref="-20" /><nucleus idref="-19" /><satellite idref="18" /></hypRelation><hypRelation relname="hashtag"><spannode idref="-19" /><nucleus idref="19" /><satellite idref="20" /></hypRelation><hypRelation relname="address"><spannode idref="-17" /><nucleus idref="16" /><satellite idref="15" /></hypRelation><hypRelation relname="address"><spannode idref="-14" /><nucleus idref="-13" /><satellite idref="12" /></hypRelation><hypRelation relname="hashtag"><spannode idref="-13" /><nucleus idref="13" /><satellite idref="14" /></hypRelation><hypRelation relname="address"><spannode idref="-11" /><nucleus idref="-10" /><satellite idref="8" /></hypRelation><hypRelation relname="elaboration"><spannode idref="-10" /><nucleus idref="9" /><satellite idref="-9" /></hypRelation><hypRelation relname="reason"><spannode idref="-9" /><nucleus idref="10" /><satellite idref="11" /></hypRelation><hypRelation relname="restatement"><spannode idref="-89" /><nucleus idref="-88" /><satellite idref="76" /></hypRelation><hypRelation relname="evaluation-n"><spannode idref="-88" /><nucleus idref="1" /><satellite idref="-3" /></hypRelation><hypRelation relname="uri"><spannode idref="-3" /><nucleus idref="2" /><satellite idref="3" /></hypRelation><hypRelation relname="address"><spannode idref="-95" /><nucleus idref="-94" /><satellite idref="4" /></hypRelation><hypRelation relname="evaluation-s"><spannode idref="-94" /><nucleus idref="-5" /><satellite idref="7" /></hypRelation><hypRelation relname="interpretation"><spannode idref="-5" /><nucleus idref="5" /><satellite idref="6" /></hypRelation><hypRelation relname="r-restatement"><spannode idref="-106" /><nucleus idref="-104" /><satellite idref="-43" /></hypRelation><hypRelation relname="r-evaluation-s"><spannode idref="-106" /><nucleus idref="-104" /><satellite idref="-110" /></hypRelation><hypRelation relname="r-antithesis"><spannode idref="-106" /><nucleus idref="-104" /><satellite idref="-39" /></hypRelation><hypRelation relname="r-evaluation-s"><spannode idref="-106" /><nucleus idref="-104" /><satellite idref="-115" /></hypRelation><hypRelation relname="r-restatement"><spannode idref="-106" /><nucleus idref="-104" /><satellite idref="-125" /></hypRelation><hypRelation relname="address"><spannode idref="-43" /><nucleus idref="-42" /><satellite idref="-41" /></hypRelation><parRelation relname="List"><spannode idref="-41" /><nucleus idref="44" /><nucleus idref="45" /></parRelation><hypRelation relname="evaluation-s"><spannode idref="-42" /><nucleus idref="46" /><satellite idref="78" /></hypRelation><hypRelation relname="uri"><spannode idref="-104" /><nucleus idref="40" /><satellite idref="41" /></hypRelation><hypRelation relname="address"><spannode idref="-110" /><nucleus idref="-109" /><satellite idref="-44" /></hypRelation><parRelation relname="Joint"><spannode idref="-109" /><nucleus idref="-107" /><nucleus idref="49" /></parRelation><hypRelation relname="evidence"><spannode idref="-107" /><nucleus idref="50" /><satellite idref="-108" /></hypRelation><hypRelation relname="antithesis"><spannode idref="-108" /><nucleus idref="51" /><satellite idref="79" /></hypRelation><parRelation relname="List"><spannode idref="-44" /><nucleus idref="47" /><nucleus idref="48" /></parRelation><hypRelation relname="address"><spannode idref="-39" /><nucleus idref="77" /><satellite idref="-38" /></hypRelation><parRelation relname="List"><spannode idref="-38" /><nucleus idref="42" /><nucleus idref="43" /></parRelation><hypRelation relname="address"><spannode idref="-115" /><nucleus idref="-113" /><satellite idref="-56" /></hypRelation><hypRelation relname="elaboration"><spannode idref="-113" /><nucleus idref="57" /><satellite idref="-53" /></hypRelation><hypRelation relname="antithesis"><spannode idref="-53" /><nucleus idref="58" /><satellite idref="-114" /></hypRelation><hypRelation relname="elaboration"><spannode idref="-114" /><nucleus idref="59" /><satellite idref="81" /></hypRelation><parRelation relname="List"><spannode idref="-56" /><nucleus idref="56" /><nucleus idref="55" /></parRelation><hypRelation relname="address"><spannode idref="-125" /><nucleus idref="-124" /><satellite idref="-51" /></hypRelation><hypRelation relname="evaluation-s"><spannode idref="-124" /><nucleus idref="54" /><satellite idref="80" /></hypRelation><parRelation relname="List"><spannode idref="-51" /><nucleus idref="52" /><nucleus idref="53" /></parRelation><hypRelation relname="r-SetQuestion"><spannode idref="-127" /><nucleus idref="21" /><satellite idref="-136" /></hypRelation><hypRelation relname="r-YesNoQuestion"><spannode idref="-127" /><nucleus idref="21" /><satellite idref="-130" /></hypRelation><hypRelation relname="r-elaboration"><spannode idref="-136" /><nucleus idref="-30" /><satellite idref="-139" /></hypRelation><hypRelation relname="elaboration"><spannode idref="-30" /><nucleus idref="-29" /><satellite idref="24" /></hypRelation><hypRelation relname="address"><spannode idref="-29" /><nucleus idref="23" /><satellite idref="22" /></hypRelation><hypRelation relname="r-elaboration"><spannode idref="-139" /><nucleus idref="-135" /><satellite idref="-138" /></hypRelation><hypRelation relname="address"><spannode idref="-135" /><nucleus idref="-134" /><satellite idref="28" /></hypRelation><hypRelation relname="elaboration"><spannode idref="-134" /><nucleus idref="29" /><satellite idref="31" /></hypRelation><hypRelation relname="address"><spannode idref="-138" /><nucleus idref="-137" /><satellite idref="35" /></hypRelation><hypRelation relname="elaboration"><spannode idref="-137" /><nucleus idref="37" /><satellite idref="-36" /></hypRelation><hypRelation relname="reason"><spannode idref="-36" /><nucleus idref="38" /><satellite idref="39" /></hypRelation><hypRelation relname="r-affirmation"><spannode idref="-130" /><nucleus idref="-102" /><satellite idref="-33" /></hypRelation><hypRelation relname="address"><spannode idref="-33" /><nucleus idref="34" /><satellite idref="32" /></hypRelation><hypRelation relname="address"><spannode idref="-102" /><nucleus idref="-101" /><satellite idref="25" /></hypRelation><hypRelation relname="hashtag"><spannode idref="-101" /><nucleus idref="26" /><satellite idref="27" /></hypRelation></relations></annotation>
+<annotation>
+    <segments>
+        <segment id="35" msgid="404550287446523904" start="0" end="13" name="0" external="0" etype=""/>
+        <segment id="37" msgid="404550287446523904" start="13" end="62" name="1" external="0" etype=""/>
+        <segment id="38" msgid="404550287446523904" start="62" end="81" name="2" external="0" etype=""/>
+        <segment id="39" msgid="404550287446523904" start="81" end="107" name="3" external="0" etype=""/>
+        <segment id="40" msgid="405974393664593920" start="0" end="100" name="0" external="0" etype=""/>
+        <segment id="41" msgid="405974393664593920" start="100" end="123" name="1" external="0" etype=""/>
+        <segment id="42" msgid="405980365963018240" start="0" end="3" name="0" external="0" etype=""/>
+        <segment id="43" msgid="405980365963018240" start="3" end="13" name="1" external="0" etype=""/>
+        <segment id="44" msgid="405979348450021376" start="0" end="3" name="0" external="0" etype=""/>
+        <segment id="45" msgid="405979348450021376" start="3" end="14" name="1" external="0" etype=""/>
+        <segment id="46" msgid="405979348450021376" start="14" end="91" name="2" external="0" etype=""/>
+        <segment id="47" msgid="405977544282742784" start="0" end="1" name="0" external="0" etype=""/>
+        <segment id="48" msgid="405977544282742784" start="1" end="14" name="1" external="0" etype=""/>
+        <segment id="49" msgid="405977544282742784" start="14" end="30" name="2" external="0" etype=""/>
+        <segment id="50" msgid="405977544282742784" start="30" end="66" name="3" external="0" etype=""/>
+        <segment id="51" msgid="405977544282742784" start="66" end="106" name="4" external="0" etype=""/>
+        <segment id="52" msgid="405979935694520320" start="0" end="3" name="0" external="0" etype=""/>
+        <segment id="53" msgid="405979935694520320" start="3" end="14" name="1" external="0" etype=""/>
+        <segment id="54" msgid="405979935694520320" start="14" end="83" name="2" external="0" etype=""/>
+        <segment id="55" msgid="405978334124732417" start="0" end="3" name="0" external="0" etype=""/>
+        <segment id="56" msgid="405978334124732417" start="3" end="14" name="1" external="0" etype=""/>
+        <segment id="57" msgid="405978334124732417" start="14" end="33" name="2" external="0" etype=""/>
+        <segment id="58" msgid="405978334124732417" start="33" end="79" name="3" external="0" etype=""/>
+        <segment id="59" msgid="405978334124732417" start="79" end="99" name="4" external="0" etype=""/>
+        <segment id="60" msgid="404261789514616832" start="0" end="65" name="0" external="0" etype=""/>
+        <segment id="61" msgid="404261977964687360" start="0" end="9" name="0" external="0" etype=""/>
+        <segment id="62" msgid="404261977964687360" start="9" end="17" name="1" external="0" etype=""/>
+        <segment id="63" msgid="404261977964687360" start="17" end="47" name="2" external="0" etype=""/>
+        <segment id="68" msgid="404262465166639104" start="0" end="15" name="0" external="0" etype=""/>
+        <segment id="70" msgid="404262465166639104" start="29" end="41" name="2" external="0" etype=""/>
+        <segment id="69" msgid="404262465166639104" start="15" end="29" name="1" external="0" etype=""/>
+        <segment id="71" msgid="404262465166639104" start="41" end="51" name="3" external="0" etype=""/>
+        <segment id="72" msgid="404262465166639104" start="51" end="70" name="4" external="0" etype=""/>
+        <segment id="73" msgid="404262465166639104" start="70" end="91" name="5" external="0" etype=""/>
+        <segment id="74" msgid="404264047748849664" start="0" end="15" name="0" external="0" etype=""/>
+        <segment id="75" msgid="404262718380584960" start="0" end="10" name="0" external="0" etype=""/>
+        <segment id="76" msgid="405346120412704768" start="108" end="134" name="3" external="0" etype=""/>
+        <segment id="77" msgid="405980365963018240" start="13" end="115" name="2" external="0" etype=""/>
+        <segment id="78" msgid="405979348450021376" start="91" end="118" name="3" external="0" etype=""/>
+        <segment id="80" msgid="405979935694520320" start="83" end="110" name="3" external="0" etype=""/>
+        <segment id="79" msgid="405977544282742784" start="106" end="138" name="5" external="0" etype=""/>
+        <segment id="81" msgid="405978334124732417" start="99" end="137" name="5" external="0" etype=""/>
+        <segment id="10" msgid="405357943836909568" start="34" end="82" name="2" external="0" etype=""/>
+        <segment id="82" msgid="404261977964687360" start="47" end="75" name="3" external="0" etype=""/>
+        <segment id="11" msgid="405357943836909568" start="82" end="133" name="3" external="0" etype=""/>
+        <segment id="83" msgid="404264047748849664" start="15" end="40" name="1" external="0" etype=""/>
+        <segment id="12" msgid="405352107144138752" start="0" end="9" name="0" external="0" etype=""/>
+        <segment id="84" msgid="404264047748849664" start="40" end="59" name="2" external="0" etype=""/>
+        <segment id="13" msgid="405352107144138752" start="9" end="70" name="1" external="0" etype=""/>
+        <segment id="85" msgid="404264465698287618" start="0" end="9" name="0" external="0" etype=""/>
+        <segment id="14" msgid="405352107144138752" start="70" end="84" name="2" external="0" etype=""/>
+        <segment id="86" msgid="404264465698287618" start="9" end="26" name="1" external="0" etype=""/>
+        <segment id="15" msgid="405437196452106241" start="0" end="9" name="0" external="0" etype=""/>
+        <segment id="87" msgid="404264465698287618" start="26" end="54" name="2" external="0" etype=""/>
+        <segment id="16" msgid="405437196452106241" start="9" end="134" name="1" external="0" etype=""/>
+        <segment id="88" msgid="404264465698287618" start="54" end="111" name="3" external="0" etype=""/>
+        <segment id="89" msgid="404264465698287618" start="111" end="122" name="4" external="0" etype=""/>
+        <segment id="90" msgid="404274739948306433" start="0" end="16" name="0" external="0" etype=""/>
+        <segment id="18" msgid="405348205992636416" start="0" end="11" name="0" external="0" etype=""/>
+        <segment id="1" msgid="405346120412704768" start="0" end="32" name="0" external="0" etype=""/>
+        <segment id="91" msgid="404274739948306433" start="16" end="37" name="1" external="0" etype=""/>
+        <segment id="19" msgid="405348205992636416" start="11" end="59" name="1" external="0" etype=""/>
+        <segment id="20" msgid="405348205992636416" start="59" end="71" name="2" external="0" etype=""/>
+        <segment id="2" msgid="405346120412704768" start="32" end="85" name="1" external="0" etype=""/>
+        <segment id="21" msgid="404534340387753985" start="0" end="64" name="0" external="1" etype="text"/>
+        <segment id="92" msgid="404261789514616832" start="64" end="81" name="1" external="0" etype=""/>
+        <segment id="3" msgid="405346120412704768" start="85" end="108" name="2" external="0" etype=""/>
+        <segment id="22" msgid="404541334905950208" start="0" end="13" name="0" external="0" etype=""/>
+        <segment id="4" msgid="405359023534268416" start="0" end="10" name="0" external="0" etype=""/>
+        <segment id="93" msgid="404263018453692416" start="0" end="9" name="0" external="0" etype=""/>
+        <segment id="23" msgid="404541334905950208" start="13" end="40" name="1" external="0" etype=""/>
+        <segment id="94" msgid="404263018453692416" start="9" end="36" name="1" external="0" etype=""/>
+        <segment id="5" msgid="405359023534268416" start="10" end="78" name="1" external="0" etype=""/>
+        <segment id="24" msgid="404541334905950208" start="40" end="104" name="2" external="0" etype=""/>
+        <segment id="95" msgid="404263018453692416" start="36" end="105" name="2" external="0" etype=""/>
+        <segment id="6" msgid="405359023534268416" start="78" end="117" name="2" external="0" etype=""/>
+        <segment id="25" msgid="404536249094270976" start="0" end="13" name="0" external="0" etype=""/>
+        <segment id="7" msgid="405359023534268416" start="117" end="140" name="3" external="0" etype=""/>
+        <segment id="96" msgid="404262748294356992" start="0" end="9" name="0" external="0" etype=""/>
+        <segment id="26" msgid="404536249094270976" start="13" end="44" name="1" external="0" etype=""/>
+        <segment id="97" msgid="404262748294356992" start="9" end="38" name="1" external="0" etype=""/>
+        <segment id="8" msgid="405357943836909568" start="0" end="9" name="0" external="0" etype=""/>
+        <segment id="27" msgid="404536249094270976" start="44" end="63" name="2" external="0" etype=""/>
+        <segment id="98" msgid="404262718380584960" start="10" end="31" name="1" external="0" etype=""/>
+        <segment id="9" msgid="405357943836909568" start="9" end="34" name="1" external="0" etype=""/>
+        <segment id="28" msgid="404549622355730432" start="0" end="8" name="0" external="0" etype=""/>
+        <segment id="99" msgid="404262718380584960" start="31" end="132" name="2" external="0" etype=""/>
+        <segment id="29" msgid="404549622355730432" start="8" end="57" name="1" external="0" etype=""/>
+        <segment id="31" msgid="404549622355730432" start="57" end="118" name="2" external="0" etype=""/>
+        <segment id="32" msgid="404550496289300480" start="0" end="15" name="0" external="0" etype=""/>
+        <segment id="34" msgid="404550496289300480" start="15" end="54" name="1" external="0" etype=""/>
+    </segments>
+    <spans>
+        <span id="-38" msgid="405980365963018240" start="42" end="43" external="0" etype=""/>
+        <span id="-39" msgid="405980365963018240" start="42" end="77" external="1" etype="text"/>
+        <span id="-41" msgid="405979348450021376" start="44" end="45" external="0" etype=""/>
+        <span id="-42" msgid="405979348450021376" start="46" end="78" external="0" etype=""/>
+        <span id="-43" msgid="405979348450021376" start="44" end="78" external="1" etype="text"/>
+        <span id="-44" msgid="405977544282742784" start="47" end="48" external="0" etype=""/>
+        <span id="-101" msgid="404536249094270976" start="26" end="27" external="0" etype=""/>
+        <span id="-102" msgid="404536249094270976" start="25" end="27" external="1" etype="text"/>
+        <span id="-3" msgid="405346120412704768" start="2" end="3" external="0" etype=""/>
+        <span id="-104" msgid="405974393664593920" start="40" end="41" external="1" etype="text"/>
+        <span id="-5" msgid="405359023534268416" start="5" end="6" external="0" etype=""/>
+        <span id="-51" msgid="405979935694520320" start="52" end="53" external="0" etype=""/>
+        <span id="-106" msgid="405974393664593920" start="-104" end="-39" external="1" etype="span"/>
+        <span id="-53" msgid="405978334124732417" start="58" end="81" external="0" etype=""/>
+        <span id="-107" msgid="405977544282742784" start="50" end="79" external="0" etype=""/>
+        <span id="-108" msgid="405977544282742784" start="51" end="79" external="0" etype=""/>
+        <span id="-9" msgid="405357943836909568" start="10" end="11" external="0" etype=""/>
+        <span id="-109" msgid="405977544282742784" start="49" end="79" external="0" etype=""/>
+        <span id="-110" msgid="405977544282742784" start="47" end="79" external="1" etype="text"/>
+        <span id="-56" msgid="405978334124732417" start="55" end="56" external="0" etype=""/>
+        <span id="-113" msgid="405978334124732417" start="57" end="81" external="0" etype=""/>
+        <span id="-58" msgid="404261977964687360" start="61" end="62" external="0" etype=""/>
+        <span id="-114" msgid="405978334124732417" start="59" end="81" external="0" etype=""/>
+        <span id="-59" msgid="404261977964687360" start="63" end="82" external="0" etype=""/>
+        <span id="-60" msgid="404261977964687360" start="61" end="82" external="1" etype="text"/>
+        <span id="-115" msgid="405978334124732417" start="55" end="81" external="1" etype="text"/>
+        <span id="-117" msgid="404262465166639104" start="72" end="73" external="0" etype=""/>
+        <span id="-118" msgid="404262465166639104" start="70" end="73" external="0" etype=""/>
+        <span id="-120" msgid="404262465166639104" start="71" end="73" external="0" etype=""/>
+        <span id="-119" msgid="404262465166639104" start="69" end="73" external="0" etype=""/>
+        <span id="-121" msgid="404262465166639104" start="68" end="73" external="1" etype="text"/>
+        <span id="-67" msgid="404264047748849664" start="83" end="84" external="0" etype=""/>
+        <span id="-122" msgid="404261977964687360" start="-60" end="-121" external="1" etype="span"/>
+        <span id="-68" msgid="404264047748849664" start="74" end="84" external="1" etype="text"/>
+        <span id="-123" msgid="404261789514616832" start="60" end="92" external="1" etype="text"/>
+        <span id="-124" msgid="405979935694520320" start="54" end="80" external="0" etype=""/>
+        <span id="-70" msgid="404264465698287618" start="87" end="88" external="0" etype=""/>
+        <span id="-69" msgid="404264465698287618" start="86" end="86" external="0" etype=""/>
+        <span id="-125" msgid="405979935694520320" start="52" end="80" external="1" etype="text"/>
+        <span id="-71" msgid="404264465698287618" start="86" end="88" external="0" etype=""/>
+        <span id="-72" msgid="404264465698287618" start="86" end="89" external="0" etype=""/>
+        <span id="-127" msgid="404534340387753985" start="21" end="-30" external="1" etype="span"/>
+        <span id="-73" msgid="404264465698287618" start="85" end="89" external="1" etype="text"/>
+        <span id="-130" msgid="404536249094270976" start="-102" end="-33" external="1" etype="span"/>
+        <span id="-75" msgid="404274739948306433" start="90" end="91" external="1" etype="text"/>
+        <span id="-134" msgid="404549622355730432" start="29" end="31" external="0" etype=""/>
+        <span id="-135" msgid="404549622355730432" start="28" end="31" external="1" etype="text"/>
+        <span id="-10" msgid="405357943836909568" start="9" end="11" external="0" etype=""/>
+        <span id="-136" msgid="404541334905950208" start="-30" end="-135" external="1" etype="span"/>
+        <span id="-11" msgid="405357943836909568" start="8" end="11" external="1" etype="text"/>
+        <span id="-137" msgid="404550287446523904" start="37" end="39" external="0" etype=""/>
+        <span id="-138" msgid="404550287446523904" start="35" end="39" external="1" etype="text"/>
+        <span id="-13" msgid="405352107144138752" start="13" end="14" external="0" etype=""/>
+        <span id="-139" msgid="404549622355730432" start="-135" end="-138" external="1" etype="span"/>
+        <span id="-14" msgid="405352107144138752" start="12" end="14" external="1" etype="text"/>
+        <span id="-140" msgid="404261789514616832" start="-123" end="-60" external="1" etype="span"/>
+        <span id="-141" msgid="404263018453692416" start="94" end="95" external="0" etype=""/>
+        <span id="-142" msgid="404263018453692416" start="93" end="95" external="1" etype="text"/>
+        <span id="-88" msgid="405346120412704768" start="1" end="3" external="0" etype=""/>
+        <span id="-17" msgid="405437196452106241" start="15" end="16" external="1" etype="text"/>
+        <span id="-89" msgid="405346120412704768" start="1" end="76" external="1" etype="text"/>
+        <span id="-144" msgid="404262748294356992" start="96" end="97" external="1" etype="text"/>
+        <span id="-19" msgid="405348205992636416" start="19" end="20" external="0" etype=""/>
+        <span id="-20" msgid="405348205992636416" start="18" end="20" external="1" etype="text"/>
+        <span id="-146" msgid="404262718380584960" start="98" end="99" external="0" etype=""/>
+        <span id="-147" msgid="404262718380584960" start="75" end="99" external="1" etype="text"/>
+        <span id="-94" msgid="405359023534268416" start="5" end="7" external="0" etype=""/>
+        <span id="-148" msgid="404262465166639104" start="-121" end="-142" external="1" etype="span"/>
+        <span id="-95" msgid="405359023534268416" start="4" end="7" external="1" etype="text"/>
+        <span id="-150" msgid="404264047748849664" start="-68" end="-73" external="1" etype="span"/>
+        <span id="-149" msgid="404263018453692416" start="-142" end="-68" external="1" etype="span"/>
+        <span id="-151" msgid="404264465698287618" start="-73" end="-75" external="1" etype="span"/>
+        <span id="-97" msgid="405346120412704768" start="-89" end="-17" external="1" etype="span"/>
+        <span id="-29" msgid="404541334905950208" start="22" end="23" external="0" etype=""/>
+        <span id="-30" msgid="404541334905950208" start="22" end="24" external="1" etype="text"/>
+        <span id="-33" msgid="404550496289300480" start="32" end="34" external="1" etype="text"/>
+        <span id="-36" msgid="404550287446523904" start="38" end="39" external="0" etype=""/>
+    </spans>
+    <relations>
+        <hypRelation relname="Elaboration">
+            <spannode idref="-137"/>
+            <nucleus idref="37"/>
+            <satellite idref="-36"/>
+        </hypRelation>
+        <hypRelation relname="Address">
+            <spannode idref="-43"/>
+            <nucleus idref="-42"/>
+            <satellite idref="-41"/>
+        </hypRelation>
+        <hypRelation relname="Reason">
+            <spannode idref="-36"/>
+            <nucleus idref="38"/>
+            <satellite idref="39"/>
+        </hypRelation>
+        <hypRelation relname="URI">
+            <spannode idref="-104"/>
+            <nucleus idref="40"/>
+            <satellite idref="41"/>
+        </hypRelation>
+        <parRelation relname="List">
+            <spannode idref="-38"/>
+            <nucleus idref="42"/>
+            <nucleus idref="43"/>
+        </parRelation>
+        <hypRelation relname="Address">
+            <spannode idref="-102"/>
+            <nucleus idref="-101"/>
+            <satellite idref="25"/>
+        </hypRelation>
+        <hypRelation relname="r-affirmation">
+            <spannode idref="-130"/>
+            <nucleus idref="-102"/>
+            <satellite idref="-33"/>
+        </hypRelation>
+        <parRelation relname="List">
+            <spannode idref="-41"/>
+            <nucleus idref="44"/>
+            <nucleus idref="45"/>
+        </parRelation>
+        <hypRelation relname="r-Antithesis">
+            <spannode idref="-106"/>
+            <nucleus idref="-104"/>
+            <satellite idref="-39"/>
+        </hypRelation>
+        <hypRelation relname="r-Restatement">
+            <spannode idref="-106"/>
+            <nucleus idref="-104"/>
+            <satellite idref="-43"/>
+        </hypRelation>
+        <hypRelation relname="r-Evaluation-S">
+            <spannode idref="-106"/>
+            <nucleus idref="-104"/>
+            <satellite idref="-110"/>
+        </hypRelation>
+        <hypRelation relname="r-Restatement">
+            <spannode idref="-106"/>
+            <nucleus idref="-104"/>
+            <satellite idref="-125"/>
+        </hypRelation>
+        <hypRelation relname="r-Evaluation-S">
+            <spannode idref="-106"/>
+            <nucleus idref="-104"/>
+            <satellite idref="-115"/>
+        </hypRelation>
+        <hypRelation relname="Evaluation-S">
+            <spannode idref="-94"/>
+            <nucleus idref="-5"/>
+            <satellite idref="7"/>
+        </hypRelation>
+        <hypRelation relname="Evaluation-S">
+            <spannode idref="-42"/>
+            <nucleus idref="46"/>
+            <satellite idref="78"/>
+        </hypRelation>
+        <parRelation relname="List">
+            <spannode idref="-44"/>
+            <nucleus idref="47"/>
+            <nucleus idref="48"/>
+        </parRelation>
+        <parRelation relname="Joint">
+            <spannode idref="-109"/>
+            <nucleus idref="49"/>
+            <nucleus idref="-107"/>
+        </parRelation>
+        <hypRelation relname="Evidence">
+            <spannode idref="-107"/>
+            <nucleus idref="50"/>
+            <satellite idref="-108"/>
+        </hypRelation>
+        <hypRelation relname="Antithesis">
+            <spannode idref="-108"/>
+            <nucleus idref="51"/>
+            <satellite idref="79"/>
+        </hypRelation>
+        <hypRelation relname="Address">
+            <spannode idref="-110"/>
+            <nucleus idref="-109"/>
+            <satellite idref="-44"/>
+        </hypRelation>
+        <parRelation relname="List">
+            <spannode idref="-51"/>
+            <nucleus idref="52"/>
+            <nucleus idref="53"/>
+        </parRelation>
+        <hypRelation relname="Evaluation-S">
+            <spannode idref="-124"/>
+            <nucleus idref="54"/>
+            <satellite idref="80"/>
+        </hypRelation>
+        <hypRelation relname="Address">
+            <spannode idref="-115"/>
+            <nucleus idref="-113"/>
+            <satellite idref="-56"/>
+        </hypRelation>
+        <hypRelation relname="Evaluation-S">
+            <spannode idref="-60"/>
+            <nucleus idref="-58"/>
+            <satellite idref="-59"/>
+        </hypRelation>
+        <parRelation relname="List">
+            <spannode idref="-56"/>
+            <nucleus idref="55"/>
+            <nucleus idref="56"/>
+        </parRelation>
+        <hypRelation relname="r-SetQuestion">
+            <spannode idref="-122"/>
+            <nucleus idref="-60"/>
+            <satellite idref="-148"/>
+        </hypRelation>
+        <hypRelation relname="Elaboration">
+            <spannode idref="-113"/>
+            <nucleus idref="57"/>
+            <satellite idref="-53"/>
+        </hypRelation>
+        <hypRelation relname="Antithesis">
+            <spannode idref="-53"/>
+            <nucleus idref="58"/>
+            <satellite idref="-114"/>
+        </hypRelation>
+        <hypRelation relname="Elaboration">
+            <spannode idref="-114"/>
+            <nucleus idref="59"/>
+            <satellite idref="81"/>
+        </hypRelation>
+        <hypRelation relname="Address">
+            <spannode idref="-123"/>
+            <nucleus idref="60"/>
+            <satellite idref="92"/>
+        </hypRelation>
+        <hypRelation relname="Address">
+            <spannode idref="-121"/>
+            <nucleus idref="-119"/>
+            <satellite idref="68"/>
+        </hypRelation>
+        <hypRelation relname="Address">
+            <spannode idref="-58"/>
+            <nucleus idref="62"/>
+            <satellite idref="61"/>
+        </hypRelation>
+        <hypRelation relname="r-InfoAnswer">
+            <spannode idref="-148"/>
+            <nucleus idref="-121"/>
+            <satellite idref="-149"/>
+        </hypRelation>
+        <hypRelation relname="r-InfoAnswer">
+            <spannode idref="-148"/>
+            <nucleus idref="-121"/>
+            <satellite idref="-144"/>
+        </hypRelation>
+        <hypRelation relname="r-InfoAnswer">
+            <spannode idref="-148"/>
+            <nucleus idref="-121"/>
+            <satellite idref="-147"/>
+        </hypRelation>
+        <hypRelation relname="Antithesis">
+            <spannode idref="-59"/>
+            <nucleus idref="63"/>
+            <satellite idref="82"/>
+        </hypRelation>
+        <hypRelation relname="Address">
+            <spannode idref="-68"/>
+            <nucleus idref="-67"/>
+            <satellite idref="74"/>
+        </hypRelation>
+        <hypRelation relname="r-Contrast">
+            <spannode idref="-150"/>
+            <nucleus idref="-68"/>
+            <satellite idref="-151"/>
+        </hypRelation>
+        <hypRelation relname="r-InfoAnswer">
+            <spannode idref="-140"/>
+            <nucleus idref="-123"/>
+            <satellite idref="-122"/>
+        </hypRelation>
+        <hypRelation relname="Address">
+            <spannode idref="-125"/>
+            <nucleus idref="-124"/>
+            <satellite idref="-51"/>
+        </hypRelation>
+        <hypRelation relname="Condition">
+            <spannode idref="-71"/>
+            <nucleus idref="-69"/>
+            <satellite idref="-70"/>
+        </hypRelation>
+        <hypRelation relname="OTHER">
+            <spannode idref="-72"/>
+            <nucleus idref="-71"/>
+            <satellite idref="89"/>
+        </hypRelation>
+        <hypRelation relname="Address">
+            <spannode idref="-73"/>
+            <nucleus idref="-72"/>
+            <satellite idref="85"/>
+        </hypRelation>
+        <hypRelation relname="r-Affirmation">
+            <spannode idref="-151"/>
+            <nucleus idref="-73"/>
+            <satellite idref="-75"/>
+        </hypRelation>
+        <hypRelation relname="Elaboration">
+            <spannode idref="-118"/>
+            <nucleus idref="70"/>
+            <satellite idref="-120"/>
+        </hypRelation>
+        <hypRelation relname="Elaboration">
+            <spannode idref="-119"/>
+            <nucleus idref="69"/>
+            <satellite idref="-118"/>
+        </hypRelation>
+        <hypRelation relname="Elaboration">
+            <spannode idref="-120"/>
+            <nucleus idref="71"/>
+            <satellite idref="-117"/>
+        </hypRelation>
+        <hypRelation relname="Elaboration">
+            <spannode idref="-117"/>
+            <nucleus idref="72"/>
+            <satellite idref="73"/>
+        </hypRelation>
+        <hypRelation relname="Address">
+            <spannode idref="-135"/>
+            <nucleus idref="-134"/>
+            <satellite idref="28"/>
+        </hypRelation>
+        <hypRelation relname="r-Elaboration">
+            <spannode idref="-139"/>
+            <nucleus idref="-135"/>
+            <satellite idref="-138"/>
+        </hypRelation>
+        <hypRelation relname="Address">
+            <spannode idref="-11"/>
+            <nucleus idref="-10"/>
+            <satellite idref="8"/>
+        </hypRelation>
+        <hypRelation relname="Address">
+            <spannode idref="-39"/>
+            <nucleus idref="77"/>
+            <satellite idref="-38"/>
+        </hypRelation>
+        <hypRelation relname="Address">
+            <spannode idref="-138"/>
+            <nucleus idref="-137"/>
+            <satellite idref="35"/>
+        </hypRelation>
+        <hypRelation relname="Address">
+            <spannode idref="-14"/>
+            <nucleus idref="-13"/>
+            <satellite idref="12"/>
+        </hypRelation>
+        <hypRelation relname="Reason">
+            <spannode idref="-9"/>
+            <nucleus idref="10"/>
+            <satellite idref="11"/>
+        </hypRelation>
+        <hypRelation relname="Address">
+            <spannode idref="-142"/>
+            <nucleus idref="-141"/>
+            <satellite idref="93"/>
+        </hypRelation>
+        <hypRelation relname="Evaluation-S">
+            <spannode idref="-67"/>
+            <nucleus idref="83"/>
+            <satellite idref="84"/>
+        </hypRelation>
+        <hypRelation relname="r-Antithesis">
+            <spannode idref="-149"/>
+            <nucleus idref="-142"/>
+            <satellite idref="-150"/>
+        </hypRelation>
+        <hypRelation relname="Hashtag">
+            <spannode idref="-13"/>
+            <nucleus idref="13"/>
+            <satellite idref="14"/>
+        </hypRelation>
+        <hypRelation relname="Hashtag">
+            <spannode idref="-89"/>
+            <nucleus idref="-88"/>
+            <satellite idref="76"/>
+        </hypRelation>
+        <hypRelation relname="r-Evaluation-S">
+            <spannode idref="-97"/>
+            <nucleus idref="-89"/>
+            <satellite idref="-95"/>
+        </hypRelation>
+        <hypRelation relname="r-Restatement">
+            <spannode idref="-97"/>
+            <nucleus idref="-89"/>
+            <satellite idref="-11"/>
+        </hypRelation>
+        <hypRelation relname="r-Communicative-Interaction">
+            <spannode idref="-97"/>
+            <nucleus idref="-89"/>
+            <satellite idref="-14"/>
+        </hypRelation>
+        <hypRelation relname="r-Communicative-Interaction">
+            <spannode idref="-97"/>
+            <nucleus idref="-89"/>
+            <satellite idref="-17"/>
+        </hypRelation>
+        <hypRelation relname="r-Solutionhood">
+            <spannode idref="-97"/>
+            <nucleus idref="-89"/>
+            <satellite idref="-20"/>
+        </hypRelation>
+        <hypRelation relname="Address">
+            <spannode idref="-20"/>
+            <nucleus idref="-19"/>
+            <satellite idref="18"/>
+        </hypRelation>
+        <parRelation relname="List">
+            <spannode idref="-70"/>
+            <nucleus idref="87"/>
+            <nucleus idref="88"/>
+        </parRelation>
+        <hypRelation relname="Address">
+            <spannode idref="-17"/>
+            <nucleus idref="16"/>
+            <satellite idref="15"/>
+        </hypRelation>
+        <hypRelation relname="Address">
+            <spannode idref="-147"/>
+            <nucleus idref="-146"/>
+            <satellite idref="75"/>
+        </hypRelation>
+        <hypRelation relname="Evaluation-N">
+            <spannode idref="-88"/>
+            <nucleus idref="1"/>
+            <satellite idref="-3"/>
+        </hypRelation>
+        <hypRelation relname="Address">
+            <spannode idref="-95"/>
+            <nucleus idref="-94"/>
+            <satellite idref="4"/>
+        </hypRelation>
+        <hypRelation relname="Address">
+            <spannode idref="-75"/>
+            <nucleus idref="91"/>
+            <satellite idref="90"/>
+        </hypRelation>
+        <hypRelation relname="Hashtag">
+            <spannode idref="-19"/>
+            <nucleus idref="19"/>
+            <satellite idref="20"/>
+        </hypRelation>
+        <hypRelation relname="URI">
+            <spannode idref="-3"/>
+            <nucleus idref="2"/>
+            <satellite idref="3"/>
+        </hypRelation>
+        <hypRelation relname="r-Communicative-Interaction">
+            <spannode idref="-127"/>
+            <nucleus idref="21"/>
+            <satellite idref="-136"/>
+        </hypRelation>
+        <hypRelation relname="r-YesNoQuestion">
+            <spannode idref="-127"/>
+            <nucleus idref="21"/>
+            <satellite idref="-130"/>
+        </hypRelation>
+        <hypRelation relname="Address">
+            <spannode idref="-29"/>
+            <nucleus idref="23"/>
+            <satellite idref="22"/>
+        </hypRelation>
+        <hypRelation relname="Elaboration">
+            <spannode idref="-141"/>
+            <nucleus idref="94"/>
+            <satellite idref="95"/>
+        </hypRelation>
+        <hypRelation relname="Interpretation">
+            <spannode idref="-5"/>
+            <nucleus idref="5"/>
+            <satellite idref="6"/>
+        </hypRelation>
+        <hypRelation relname="Elaboration">
+            <spannode idref="-30"/>
+            <nucleus idref="-29"/>
+            <satellite idref="24"/>
+        </hypRelation>
+        <hypRelation relname="r-Elaboration">
+            <spannode idref="-136"/>
+            <nucleus idref="-30"/>
+            <satellite idref="-139"/>
+        </hypRelation>
+        <hypRelation relname="Hashtag">
+            <spannode idref="-101"/>
+            <nucleus idref="26"/>
+            <satellite idref="27"/>
+        </hypRelation>
+        <hypRelation relname="Address">
+            <spannode idref="-144"/>
+            <nucleus idref="97"/>
+            <satellite idref="96"/>
+        </hypRelation>
+        <hypRelation relname="Elaboration">
+            <spannode idref="-146"/>
+            <nucleus idref="98"/>
+            <satellite idref="99"/>
+        </hypRelation>
+        <hypRelation relname="Elaboration">
+            <spannode idref="-10"/>
+            <nucleus idref="9"/>
+            <satellite idref="-9"/>
+        </hypRelation>
+        <hypRelation relname="Elaboration">
+            <spannode idref="-134"/>
+            <nucleus idref="29"/>
+            <satellite idref="31"/>
+        </hypRelation>
+        <hypRelation relname="Address">
+            <spannode idref="-33"/>
+            <nucleus idref="34"/>
+            <satellite idref="32"/>
+        </hypRelation>
+    </relations>
+</annotation>
+
