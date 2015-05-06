@@ -9,13 +9,14 @@ script_name [OPTIONS] src_dir anno_dir1 anno_dir2
 
 ##################################################################
 # Libraries
-from rst import RSTForrest, FIELD_SEP, TREE_INTERNAL, TSV_FMT
+from rst import RSTForrest, FIELD_SEP, TREE_INTERNAL, XML_FMT
 
 from collections import defaultdict, Counter
 import argparse
 import glob
 import os
 import sys
+import xml.etree.ElementTree as ET
 
 ##################################################################
 # Variables and Constants
@@ -275,6 +276,18 @@ def _get_subtrees(a_rsttree):
             ret.append(((subtree.t_start, subtree.t_end), subtree))
     return ret
 
+def _get_messages(a_thread, a_messages):
+    """
+    Populate dictionary of messages
+
+    @param a_thread - XML element representing whole thread
+    @param a_messages - dictionary in which to store the thread messages
+    """
+    for imsg in a_thread.iterfind('msg'):
+        a_messages[imsg.get("id")] = imsg.find("text").text.encode(ENCODING).strip()
+        for chmsg in imsg.iterfind('msg'):
+            _get_messages(chmsg, a_messages)
+
 def _update_stat(a_argmnt_stat, a_rsttree1, a_rsttree2, a_msgid, a_txt, a_chck_flags, \
                      a_diff, a_sgm_strict):
     """
@@ -330,7 +343,7 @@ def _update_stat(a_argmnt_stat, a_rsttree1, a_rsttree2, a_msgid, a_txt, a_chck_f
                                   segs2trees2, a_diff)
 
 def update_stat(a_src_fname, a_anno1_fname, a_anno2_fname, a_chck_flags, a_diff = False, \
-                    a_sgm_strict = True, a_file_fmt = TSV_FMT, a_verbose = True):
+                    a_sgm_strict = True, a_file_fmt = XML_FMT, a_verbose = True):
     """
     Measure agreement of two files.
 
@@ -351,14 +364,11 @@ def update_stat(a_src_fname, a_anno1_fname, a_anno2_fname, a_chck_flags, a_diff 
     # read source file
     messages = {}
     fields = []
-    with open(a_src_fname) as ifile:
-        for line in ifile:
-            line = line.decode(ENCODING).strip()
-            if not line:
-                continue
-            fields = line.split(FIELD_SEP)
-            assert len(fields) == 2, u"Incorrect format: '{:s}'".format(line).encode(ENCODING)
-            messages[fields[0]] = fields[1]
+    srctree = ET.parse(a_src_fname).getroot()
+
+    for ithread in srctree.iter('thread'):
+        _get_messages(ithread, messages)
+    print >> sys.stderr, repr(messages)
     # read first annotation file
     rstForrest1 = RSTForrest(a_file_fmt)
     _read_anno_file(a_anno1_fname, rstForrest1)
@@ -403,13 +413,13 @@ def main(argv):
 on RST.""")
     # optional arguments
     argparser.add_argument("--anno-sfx", help = "extension of annotation files", type = str,
-                         default = "*")
+                         default = "")
     argparser.add_argument("-d", "--output-difference", help = """output difference""",
                          action = "store_true")
     argparser.add_argument("-e", "--encoding", help = """encoding of input file[s]""",
                          type = str, default = "utf-8")
     argparser.add_argument("--file-format", help = "format of annotation file", type = str,
-                         default = TSV_FMT)
+                         default = XML_FMT)
     argparser.add_argument("--segment-strict", help = """use strict metric
 for evaluating segment agreement""", action = "store_true")
     argparser.add_argument("--src-ptrn", help = "shell pattern of source files", type = str,

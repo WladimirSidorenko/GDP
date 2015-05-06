@@ -7,7 +7,7 @@ FIELD_SEP = '\t'
 VALUE_SEP = '\034'
 
 # output formats
-TSV_FMT = 1
+XML_FMT = 1
 LSP_FMT = 2
 PC3_FMT = 4
 

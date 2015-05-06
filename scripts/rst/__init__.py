@@ -13,6 +13,7 @@ VALUE_SEP - attribute-value separator for TSV format
 TSV_FMT - flag for tab-separated format
 LSP_FMT - flag for s-expression format
 PC3_FMT - flag for PC3 (SGML) format
+XML_FMT - flag for XML format
 TREE_INTERNAL - flag indicating that only internal tree nodes
           should be processed
 TREE_EXTERNAL - flag indicating that only external tree nodes
@@ -41,7 +42,7 @@ RSTBadStructure - raised when data structure to be read appears to be broken
 ##################################################################
 # Imports
 from constants import ENCODING, LIST_SEP, FIELD_SEP, VALUE_SEP, \
-    TSV_FMT, LSP_FMT, PC3_FMT, TREE_INTERNAL, TREE_EXTERNAL, \
+    LSP_FMT, XML_FMT, PC3_FMT, TREE_INTERNAL, TREE_EXTERNAL, \
     TREE_ALL, NUC_RELS
 
 from exceptions import RSTException, RSTBadFormat, RSTBadLogic, RSTBadStructure

@@ -20,7 +20,7 @@ RSTTree - class representing single RST tree
 ##################################################################
 # Imports
 from constants import ENCODING, LIST_SEP, FIELD_SEP, VALUE_SEP, \
-    TSV_FMT, LSP_FMT, PC3_FMT, TREE_INTERNAL, TREE_EXTERNAL, TREE_ALL, \
+    XML_FMT, TREE_INTERNAL, TREE_EXTERNAL, TREE_ALL, \
     NUC_RELS, _CHILDREN, _TEXT, _OFFSETS
 from exceptions import RSTBadFormat, RSTBadLogic, RSTBadStructure
 
