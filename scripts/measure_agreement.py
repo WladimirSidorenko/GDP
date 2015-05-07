@@ -47,23 +47,6 @@ CHCK_ALL = 7
 
 ##################################################################
 # Methods
-def _read_anno_file(a_anno_fname, a_rst):
-    """
-    Read annotation file and update corresponding RST forrest.
-
-    @param a_anno_fname - name of the 1-st file containing annotation
-    @param a_rst - RST forrest to be populated from given file
-
-    @return \c void
-    """
-    print >> sys.stderr, "Processing file '" + a_anno_fname + "'"
-    with open(a_anno_fname) as ifile:
-        fields = {}
-        for line in ifile:
-            # print >> sys.stderr, "line =", repr(line)
-            line = line.strip()
-            a_rst.parse_line(line.decode(ENCODING))
-
 def _merge_stat(a_trg_stat, a_src_stat):
     """
     Update statistics of a_trg_stat with a_src_stat.
@@ -260,20 +243,21 @@ def _update_attr_stat(a_argmnt_stat, a_attr, a_subsegs, a_segs2trees1, a_segs2tr
                                                    "\nvs.\n" + tree2.minimal_str(TREE_INTERNAL, \
                                                                                      a_attr))
 
-def _get_subtrees(a_rsttree):
+def _get_subtrees(a_rsttrees):
     """
     Obtain all subtrees from a given tree.
 
-    @param a_rsttree - main RST tree to obtain subtrees from
+    @param a_rsttrees - RST trees to obtain subtrees from
 
     @return list of 2-tuples with tree offsets and subtrees
     """
     ret = []
-    for subtree in a_rsttree.get_subtrees():
-        if subtree.start >= 0:
-            ret.append(((subtree.start, subtree.end), subtree))
-        else:
-            ret.append(((subtree.t_start, subtree.t_end), subtree))
+    for irsttree in a_rsttrees:
+        for subtree in irsttree.get_subtrees():
+            if subtree.start >= 0:
+                ret.append(((subtree.start, subtree.end), subtree))
+            else:
+                ret.append(((subtree.t_start, subtree.t_end), subtree))
     return ret
 
 def _get_messages(a_thread, a_messages):
@@ -288,14 +272,14 @@ def _get_messages(a_thread, a_messages):
         for chmsg in imsg.iterfind('msg'):
             _get_messages(chmsg, a_messages)
 
-def _update_stat(a_argmnt_stat, a_rsttree1, a_rsttree2, a_msgid, a_txt, a_chck_flags, \
+def _update_stat(a_argmnt_stat, a_rsttrees1, a_rsttrees2, a_msgid, a_txt, a_chck_flags, \
                      a_diff, a_sgm_strict):
     """
     Measure agreement of two RST trees.
 
     @param a_argmnt_stat - dictionary with agreement statistics to be updated
-    @param a_rsttree1 - RST tree from 1-st annotation
-    @param a_rsttree2 - RST tree from 2-nd annotation
+    @param a_rsttrees1 - RST trees from 1-st annotation
+    @param a_rsttrees2 - RST trees from 2-nd annotation
     @param a_msgid - id of the message to be annnotated
     @param a_txt - raw text of the trees
     @param a_chck_flags - flags specifying which elements should be tested
@@ -306,8 +290,9 @@ def _update_stat(a_argmnt_stat, a_rsttree1, a_rsttree2, a_msgid, a_txt, a_chck_f
     @return \c void
 
     """
-    edus1 = a_rsttree1.get_edus()
-    edus2 = a_rsttree2.get_edus()
+    edus1 = [rsttree.get_edus() for rsttree in a_rsttrees1]
+    edus2 = [rsttree.get_edus() for rsttree in a_rsttrees2]
+    print >> sys.stderr, "rsttree.edus"
     if a_chck_flags & CHCK_SEGMENTS:
         _update_segment_stat(a_argmnt_stat[SEGMENTS], a_txt, edus1, edus2, \
                                       a_diff, a_sgm_strict)
@@ -332,8 +317,8 @@ def _update_stat(a_argmnt_stat, a_rsttree1, a_rsttree2, a_msgid, a_txt, a_chck_f
                 assert end_j >= 0, "Invalid start of RSTTree: {:d}".format(end_j)
                 subsegs.append((start_i, end_j))
         print >> sys.stderr, "subsegs = ", repr(subsegs)
-        segs2trees1 = defaultdict(lambda: None, _get_subtrees(a_rsttree1))
-        segs2trees2 = defaultdict(lambda: None, _get_subtrees(a_rsttree2))
+        segs2trees1 = defaultdict(lambda: None, _get_subtrees(a_rsttrees1))
+        segs2trees2 = defaultdict(lambda: None, _get_subtrees(a_rsttrees2))
 
         if a_chck_flags & CHCK_NUCLEARITY:
             _update_attr_stat(a_argmnt_stat[NUCLEARITY], "nucleus", subsegs, segs2trees1, \
@@ -361,36 +346,33 @@ def update_stat(a_src_fname, a_anno1_fname, a_anno2_fname, a_chck_flags, a_diff 
 
     """
     global KAPPA_STAT
-    # read source file
+    # read messages
     messages = {}
-    fields = []
     srctree = ET.parse(a_src_fname).getroot()
-
     for ithread in srctree.iter('thread'):
         _get_messages(ithread, messages)
-    print >> sys.stderr, repr(messages)
     # read first annotation file
     rstForrest1 = RSTForrest(a_file_fmt)
-    _read_anno_file(a_anno1_fname, rstForrest1)
+    rstForrest1.parse(a_anno1_fname)
     # read second annotation file
     rstForrest2 = RSTForrest(a_file_fmt)
-    _read_anno_file(a_anno2_fname, rstForrest2)
+    rstForrest2.parse(a_anno2_fname)
     # perform neccessary agreement tests
     skip = False
     agrmt_stat = defaultdict(KAPPA_GEN)
     for msg_id, msg in messages.iteritems():
         skip = False
-        if msg_id not in rstForrest1.msgid2tree:
+        if msg_id not in rstForrest1.msgid2trees:
             print >> sys.stderr, \
-                """WARNING: Message {:s} was not annotated by 1-st annotator""".format(msg_id)
+                """WARNING: Message {:s} was not annotated by the 1-st annotator""".format(msg_id)
             skip = True
-        if msg_id not in rstForrest2.msgid2tree:
+        if msg_id not in rstForrest2.msgid2trees:
             print >> sys.stderr, \
-                """WARNING: Message {:s} was not annotated by 2-nd annotator""".format(msg_id)
+                """WARNING: Message {:s} was not annotated by the 2-nd annotator""".format(msg_id)
             skip = True
         if skip:
             continue
-        _update_stat(agrmt_stat, rstForrest1.msgid2tree[msg_id], rstForrest2.msgid2tree[msg_id], \
+        _update_stat(agrmt_stat, rstForrest1.msgid2trees[msg_id], rstForrest2.msgid2trees[msg_id], \
                          msg_id, messages[msg_id], a_chck_flags, a_diff, a_sgm_strict)
         # delete both lines
         # output_stat(agrmt_stat, sys.stdout, "Statistics on file {:s}".format(a_src_fname))

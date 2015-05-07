@@ -30,6 +30,7 @@ class RSTForrest(object):
     msgid2trees - mapping from message id to its corresponding (sub-)tree
 
     Methods:
+    clear - public method for re-setting data
     parse - general method for parsing files
 
     """
@@ -52,6 +53,14 @@ class RSTForrest(object):
         else:
             raise NotImplementedError
 
+    def __unicode__(self):
+        """
+        Return unicode representation of given forrest.
+
+        @return unicode representation of the forrest
+        """
+        return u"\n\n".join([unicode(t) for t in self.trees])
+
     def __str__(self):
         """
         Return string representation of given forrest.
@@ -60,13 +69,16 @@ class RSTForrest(object):
         """
         return unicode(self).encode(ENCODING)
 
-    def __unicode__(self):
+    def clear(self):
         """
-        Return unicode representation of given forrest.
+        Public method for re-setting data.
 
-        @return unicode representation of the forrest
+        @return \c void
         """
-        return u"\n\n".join([unicode(t) for t in self.trees])
+        self.trees.clear()
+        self.msgid2trees.clear()
+        self._nid2tree.clear()
+        self._nid2msgid.clear()
 
     def parse(self, a_file):
         """
@@ -90,18 +102,52 @@ class RSTForrest(object):
         idoc = ET.parse(a_file).getroot()
         # read segments and spans
         iid = -1; itree = None
-        inodes = [iseg in idoc.iterfind("segment")] + [ispan in idoc.iterfind("span")]
+        inodes = [iseg for iseg in idoc.iterfind("segments/segment")] + \
+            sorted([ispan for ispan in idoc.iterfind("spans/span")], key = lambda s: s.get("id"))
         for inode in inodes:
             iid = inode.attrib.pop("id")
+            inode.attrib["type"] = inode.tag
+            print >> sys.stderr, "_parse_xml: iid =", iid
+            print >> sys.stderr, "_parse_xml: inode.attrib =", repr(inode.attrib)
             itree = RSTTree(iid, **inode.attrib)
+            # update offset information
+            if not itree._terminal and (itree.external == 0 or itree.etype == "text"):
+                itree.t_start = self._nid2tree[itree.start].start
+                itree.t_end = self._nid2tree[itree.end].end
+            self._nid2tree[iid] = itree
+            self._nid2msgid[iid] = itree.msgid
             self.trees.add(itree)
+            print >> sys.stderr, "_parse_xml: itree.msgid =", itree.msgid
             if itree.msgid in self.msgid2trees:
-                self.msgid2trees.add(itree)
+                self.msgid2trees[itree.msgid].add(itree)
             else:
-                self.msgid2trees = set([itree])
-        # read relations
+                self.msgid2trees[itree.msgid] = set([itree])
+        # read hypotactic relations
+        span_id = nuc_id = sat_id = None
+        span_tree = nuc_tree = sat_tree = None
         for irel in idoc.iterfind("hypRelation"):
-            set
+            span_id = irel.find("spannode").get("idref"); span_tree = self._nid2tree[span_id]
+            nuc_id = irel.find("nucleus").get("idref"); nuc_tree = self._nid2tree[nuc_id]
+            sat_id = irel.find("satellite").get("idref"); sat_tree = self._nid2tree[sat_id]
+            # update parent and child information of nucleus and satellite
+            nuc_tree.relation = "span"; nuc_tree.parent = span_tree; nuc_tree.nucleus = True
+            sat_tree.relation = irel.get("relname"); sat_tree.parent = nuc_tree; sat_tree.nucleus = False
+            # update child information of nucleus and span
+            nuc_tree.add_children(sat_tree)
+            span_tree.add_children(nuc_tree)
+            # remove nucleus and satellite from the list of tree roots
+            self.trees.discard(sat_tree); self.trees.discard(nuc_tree)
+        # read paratactic relations
+        relname = ""
+        for irel in idoc.iterfind("parRelation"):
+            relname = irel.get("relname")
+            span_id = irel.find("spannode").get("idref"); span_tree = self._nid2tree[span_id]
+            for inuc in irel.iterfind("nucleus"):
+                nuc_id = inuc.get("idref"); nuc_tree = self._nid2tree[nuc_id]
+                nuc_tree.relation = relname; nuc_tree.parent = span_tree; nuc_tree.nucleus = True
+                # update child information of span
+                span_tree.add_children(nuc_tree)
+
 #     def _parse_tsv(self, a_line):
 #         """
 #         Parse line in tab-separated value format.

@@ -74,6 +74,8 @@ class RSTTree(object):
         self.msgid = None
         self.parent = None
         self.relname = None
+        self.etype = None
+        self.external = False
         self.echildren = set()
         self.ichildren = set()
         self.nucleus = False
@@ -242,17 +244,18 @@ class RSTTree(object):
 
         if self._terminal:
             ret.append(self)
-        elif self.start >= 0:
-            self._terminal = True
-            ret.append(self)
 
         if a_flag & TREE_INTERNAL:
-            for ch in self.ichildren:
-                ret += ch.get_edus(a_flag)
-        ret.sort(key = lambda edu: edu.start)
+            if not self.external or self.etype == "text":
+                for ch in self.ichildren:
+                    ret += ch.get_edus(a_flag)
+                ret.sort(key = lambda edu: edu.start)
         if a_flag & TREE_EXTERNAL:
             for ch in self.echildren:
                 ret += ch.get_edus(a_flag)
+            if self.external and self.etype != "text":
+                for ch in self.ichildren:
+                    ret += ch.get_edus(a_flag)
         return ret
 
     def get_subtrees(self, a_flag = TREE_INTERNAL):
@@ -267,12 +270,16 @@ class RSTTree(object):
         ret = []
         ret.append(self)
         if a_flag & TREE_INTERNAL:
-            for ch in self.ichildren:
-                ret += ch.get_subtrees(a_flag)
-        ret.sort()
+            if not self.external or self.etype == "text":
+                for ch in self.ichildren:
+                    ret += ch.get_subtrees(a_flag)
+                ret.sort()
         if a_flag & TREE_EXTERNAL:
             for ch in self.echildren:
                 ret += ch.get_subtrees(a_flag)
+            if self.external and self.etype != "text":
+                for ch in self.ichildren:
+                    ret += ch.get_subtrees(a_flag)
         return ret
 
     def update(self, **a_attrs):
@@ -283,50 +290,17 @@ class RSTTree(object):
 
         @return \c void
         """
-        if "msgid" in a_attrs:
-            self.msgid = a_attrs.pop("msgid")
-
-        if _OFFSETS in a_attrs and a_attrs[_OFFSETS] is not None:
-            # print >> sys.stderr, "offsets =", repr(a_attrs[_OFFSETS])
-            if len(a_attrs[_OFFSETS]) == 2:
-                self.start, self.end = [int(ofs) for ofs in a_attrs[_OFFSETS]]
-                # print >> sys.stderr, "0) self.start =", self.start
-                # print >> sys.stderr, "0) self.end =", self.end
-                assert _TEXT in a_attrs, \
-                    "Text attribute not specified for terminal node {:s}.".format(self.msgid or "")
-                text = a_attrs[_TEXT]
-                t_len = len(text)
-                deltat_start = t_len - len(text)
-                deltat_end = t_len - len(text)
-                # print >> sys.stderr, "0) delta.start =", deltat_start
-                # print >> sys.stderr, "0) delta.end =", deltat_end
-                self.start += deltat_start
-                self.end -= deltat_end
-                self.t_start = self.start; self.t_end = self.end
-                a_attrs[_TEXT] = text
-            elif a_attrs[_OFFSETS]:
-                raise RSTBadFormat("Bad offset format:" + VALUE_SEP.join(a_attrs[_OFFSETS]))
-            a_attrs.pop(_OFFSETS, None)
-
-        if _CHILDREN in a_attrs:
-            self.add_children(*a_attrs[_CHILDREN])
-            a_attrs.pop(_CHILDREN, None)
-            # print >> sys.stderr, "1) self.start =", self.start
-            # print >> sys.stderr, "1) self.end =", self.end
-
         for k, v in a_attrs.iteritems():
             if hasattr(self, k):
                 setattr(self, k, v)
-
-        if self.type == _TEXT:
+        # set private variables and convert types of some attributes
+        if self.type == "segment":
             self._terminal = True
-
-        if self.relname in NUC_RELS:
-            self.nucleus = True
-
-        self._update_parent()
-        # print >> sys.stderr, "2) self.start =", self.start
-        # print >> sys.stderr, "2) self.end =", self.end
+            self.t_start = self.start = int(self.start)
+            self.t_end = self.end = int(self.end)
+        else:
+            self._terminal = False
+        self.external = int(self.external)
 
     def _escape_text(self, a_text):
         """
@@ -338,25 +312,25 @@ class RSTTree(object):
         """
         return '"' + QUOTE.sub(ESCAPED, a_text) + '"'
 
-    def _update_parent(self):
-        """
-        Update parent's start and end attributes if necessary.
+    # def _update_parent(self):
+    #     """
+    #     Update parent's start and end attributes if necessary.
 
-        @return \c void
-        """
-        if self.parent is None or self.parent.msgid != self.msgid:
-            return
-        changed = False
-        if self.t_start >= 0 and (self.parent.t_start < 0 or self.parent.t_start > self.t_start):
-            changed = True
-            self.parent.t_start = self.t_start
+    #     @return \c void
+    #     """
+    #     if self.parent is None or self.parent.msgid != self.msgid:
+    #         return
+    #     changed = False
+    #     if self.t_start >= 0 and (self.parent.t_start < 0 or self.parent.t_start > self.t_start):
+    #         changed = True
+    #         self.parent.t_start = self.t_start
 
-        if self.t_end >= 0 and (self.parent.t_end < 0 or self.parent.t_end < self.t_end):
-            changed = True
-            self.parent.t_end = self.t_end
+    #     if self.t_end >= 0 and (self.parent.t_end < 0 or self.parent.t_end < self.t_end):
+    #         changed = True
+    #         self.parent.t_end = self.t_end
 
-        if changed:
-            self.parent._update_parent()
+    #     if changed:
+    #         self.parent._update_parent()
 
     def _unicode_children(self, a_children):
         """
