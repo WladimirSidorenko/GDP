@@ -257,8 +257,7 @@
         <span id="-312" msgid="327830905311883264" start="-310" end="-212" external="1" etype="span"/>
         <span id="-313" msgid="328567453984645120" start="221" end="222" external="0" etype=""/>
         <span id="-314" msgid="328567453984645120" start="-313" end="223" external="0" etype=""/>
-        <span id="-315" msgid="328567453984645120" start="-314" end="223" external="0" etype=""/>
-        <span id="-316" msgid="328567453984645120" start="220" end="-315" external="1" etype="text"/>
+        <span id="-316" msgid="328567453984645120" start="220" end="-314" external="1" etype="text"/>
         <span id="-317" msgid="327824898305167360" start="224" end="225" external="1" etype="text"/>
         <span id="-35" msgid="319830118266707968" start="25" end="26" external="0" etype=""/>
         <span id="-36" msgid="319830118266707968" start="24" end="26" external="1" etype="text"/>
@@ -604,11 +603,6 @@
             <nucleus idref="-313"/>
             <satellite idref="223"/>
         </hypRelation>
-        <hypRelation relname="OTHER">
-            <spannode idref="-315"/>
-            <nucleus idref="-314"/>
-            <satellite idref="223"/>
-        </hypRelation>
         <parRelation relname="Joint">
             <spannode idref="-108"/>
             <nucleus idref="94"/>
@@ -616,7 +610,7 @@
         </parRelation>
         <hypRelation relname="Address">
             <spannode idref="-316"/>
-            <nucleus idref="-315"/>
+            <nucleus idref="-314"/>
             <satellite idref="220"/>
         </hypRelation>
         <hypRelation relname="URI">
