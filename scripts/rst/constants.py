@@ -16,6 +16,8 @@ TREE_INTERNAL = 1
 TREE_EXTERNAL = 2
 TREE_ALL = 3
 
+TERMINAL = "text"
+
 # relations that can go out from a nucleus node
 NUC_RELS = set(["List", "Joint", "Sequence", "Contrast", "Same", "Comparison", \
                    "OTHER-multinuc", "span"])

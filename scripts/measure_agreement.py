@@ -12,6 +12,7 @@ script_name [OPTIONS] src_dir anno_dir1 anno_dir2
 from rst import RSTForrest, FIELD_SEP, TREE_INTERNAL, XML_FMT
 
 from collections import defaultdict, Counter
+from itertools import chain
 import argparse
 import glob
 import os
@@ -183,6 +184,9 @@ def _update_segment_stat(a_argmnt_stat, a_txt, a_edus1, a_edus2, a_diff = False,
     # update number of total and overlapping segments
     bndr1 = set([edu.end for edu in a_edus1])
     bndr2 = set([edu.end for edu in a_edus2])
+    print >> sys.stderr, "bndr1 =", repr(bndr1)
+    print >> sys.stderr, "bndr2 =", repr(bndr2)
+
     seg_seg_overlap = len(bndr1 & bndr2)
     total_seg = len(bndr1 | bndr2)
 
@@ -197,9 +201,8 @@ def _update_segment_stat(a_argmnt_stat, a_txt, a_edus1, a_edus2, a_diff = False,
     # scheme.  For strict metric, NONSEG <-> NONSEG is going to be 0.
     if not a_strict:
         confusion_mtx[NONSEG][NONSEG] += len(a_txt.split()) - total_seg
-
-    if a_diff:
-        _update_segment_diff(a_argmnt_stat[DIFF_IDX], a_txt, bndr1, bndr2)
+    # if a_diff:
+    #     _update_segment_diff(a_argmnt_stat[DIFF_IDX], a_txt, bndr1, bndr2)
 
 def _update_attr_stat(a_argmnt_stat, a_attr, a_subsegs, a_segs2trees1, a_segs2trees2, \
                                 a_diff = False):
@@ -254,10 +257,7 @@ def _get_subtrees(a_rsttrees):
     ret = []
     for irsttree in a_rsttrees:
         for subtree in irsttree.get_subtrees():
-            if subtree.start >= 0:
-                ret.append(((subtree.start, subtree.end), subtree))
-            else:
-                ret.append(((subtree.t_start, subtree.t_end), subtree))
+            ret.append(((subtree.t_start, subtree.t_end), subtree))
     return ret
 
 def _get_messages(a_thread, a_messages):
@@ -290,25 +290,25 @@ def _update_stat(a_argmnt_stat, a_rsttrees1, a_rsttrees2, a_msgid, a_txt, a_chck
     @return \c void
 
     """
-    edus1 = [rsttree.get_edus() for rsttree in a_rsttrees1]
-    edus2 = [rsttree.get_edus() for rsttree in a_rsttrees2]
-    print >> sys.stderr, "rsttree.edus"
+    edus1 = [edu for rsttree in a_rsttrees1 for edu in rsttree.get_edus()]
+    edus2 = [edu for rsttree in a_rsttrees2 for edu in rsttree.get_edus()]
+    # estimate agreement on segment boundaries
     if a_chck_flags & CHCK_SEGMENTS:
         _update_segment_stat(a_argmnt_stat[SEGMENTS], a_txt, edus1, edus2, \
                                       a_diff, a_sgm_strict)
     subsegs = []
+    # chain(edus1, edus2)
     if a_chck_flags & (CHCK_NUCLEARITY | CHCK_RELATIONS):
         # obtain starts and ends of segments
-        starts = list(set([edu.start for edus in [edus1, edus2] for edu in edus]))
+        starts = list(set([edu.start for edu in chain(edus1, edus2)]))
         starts.sort()
-        ends = list(set(edu.end for edus in [edus1, edus2] for edu in edus))
+        ends = list(set(edu.end for edu in chain(edus1, edus2)))
         ends.sort()
         # generate all possible subsegments
         j_end = 0
-        print >> sys.stderr, str(a_rsttree1)
-        print >> sys.stderr, str(a_rsttree2)
         # for each start position, create a list of tuples with this start
-        # position
+        # position as the first element and all succeeding end positions as the
+        # second elements
         for start_i in starts:
             assert start_i >= 0, "Invalid start of RSTTree: {:d}".format(start_i)
             while j_end < len(ends) and ends[j_end] <= start_i:
@@ -319,6 +319,9 @@ def _update_stat(a_argmnt_stat, a_rsttrees1, a_rsttrees2, a_msgid, a_txt, a_chck
         print >> sys.stderr, "subsegs = ", repr(subsegs)
         segs2trees1 = defaultdict(lambda: None, _get_subtrees(a_rsttrees1))
         segs2trees2 = defaultdict(lambda: None, _get_subtrees(a_rsttrees2))
+        print >> sys.stderr, "segs2trees1 = ", repr(segs2trees1)
+        print >> sys.stderr, "segs2trees2 = ", repr(segs2trees2)
+        sys.exit(66)
 
         if a_chck_flags & CHCK_NUCLEARITY:
             _update_attr_stat(a_argmnt_stat[NUCLEARITY], "nucleus", subsegs, segs2trees1, \
@@ -349,6 +352,7 @@ def update_stat(a_src_fname, a_anno1_fname, a_anno2_fname, a_chck_flags, a_diff 
     # read messages
     messages = {}
     srctree = ET.parse(a_src_fname).getroot()
+    print >> sys.stderr, "Processing file: '{:s}'".format(a_src_fname)
     for ithread in srctree.iter('thread'):
         _get_messages(ithread, messages)
     # read first annotation file
@@ -362,17 +366,17 @@ def update_stat(a_src_fname, a_anno1_fname, a_anno2_fname, a_chck_flags, a_diff 
     agrmt_stat = defaultdict(KAPPA_GEN)
     for msg_id, msg in messages.iteritems():
         skip = False
-        if msg_id not in rstForrest1.msgid2trees:
+        if msg_id not in rstForrest1.msgid2iroots:
             print >> sys.stderr, \
                 """WARNING: Message {:s} was not annotated by the 1-st annotator""".format(msg_id)
             skip = True
-        if msg_id not in rstForrest2.msgid2trees:
+        if msg_id not in rstForrest2.msgid2iroots:
             print >> sys.stderr, \
                 """WARNING: Message {:s} was not annotated by the 2-nd annotator""".format(msg_id)
             skip = True
         if skip:
             continue
-        _update_stat(agrmt_stat, rstForrest1.msgid2trees[msg_id], rstForrest2.msgid2trees[msg_id], \
+        _update_stat(agrmt_stat, rstForrest1.msgid2iroots[msg_id], rstForrest2.msgid2iroots[msg_id], \
                          msg_id, messages[msg_id], a_chck_flags, a_diff, a_sgm_strict)
         # delete both lines
         # output_stat(agrmt_stat, sys.stdout, "Statistics on file {:s}".format(a_src_fname))
@@ -398,8 +402,6 @@ on RST.""")
                          default = "")
     argparser.add_argument("-d", "--output-difference", help = """output difference""",
                          action = "store_true")
-    argparser.add_argument("-e", "--encoding", help = """encoding of input file[s]""",
-                         type = str, default = "utf-8")
     argparser.add_argument("--file-format", help = "format of annotation file", type = str,
                          default = XML_FMT)
     argparser.add_argument("--segment-strict", help = """use strict metric
@@ -417,7 +419,6 @@ to measure the agreement""", choices = [SEGMENTS, NUCLEARITY, RELATIONS, ALL],
     argparser.add_argument("anno2_dir", help = "directory with annotation files of second annotator")
     args = argparser.parse_args(argv)
     # set parameters
-    ENCODING = args.encoding
     chck_flags = 0
     if args.type:
         for itype in set(args.type):

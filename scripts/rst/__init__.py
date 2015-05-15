@@ -14,6 +14,7 @@ TSV_FMT - flag for tab-separated format
 LSP_FMT - flag for s-expression format
 PC3_FMT - flag for PC3 (SGML) format
 XML_FMT - flag for XML format
+TERMINAL - string representing that given node is of terminal type
 TREE_INTERNAL - flag indicating that only internal tree nodes
           should be processed
 TREE_EXTERNAL - flag indicating that only external tree nodes

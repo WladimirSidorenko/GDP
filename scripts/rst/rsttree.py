@@ -216,19 +216,31 @@ class RSTTree(object):
         @return pointer to this tree
         """
         changed = False
+        external = bool(self.external and self.etype != TERMINAL)
+        min_start = max_end = -1
         for ch in a_children:
+            # update lists of children
             if ch.msgid is None or ch.msgid == self.msgid:
-                if ch.t_start >= 0 and (self.t_start < 0 or ch.t_start < self.t_start):
-                    changed = True
-                    self.t_start = ch.t_start
-                if ch.t_end >= 0 and (self.t_end < 0 or ch.t_end > self.t_end):
-                    changed = True
-                    self.t_end = ch.t_end
                 self.ichildren.add(ch)
             else:
                 self.echildren.add(ch)
-        if changed:
-            self._update_parent()
+            if self.external and
+            # update minimum start and maximum character offsets available from
+            # children
+            if external:
+                # update minimum start and maximum character offsets available from
+                # children
+                if min_start < 0 or ch.id < min_start:
+                    min_start = ch.id
+                if max_end < 0 or ch.id > max_end:
+                    max_end = ch.id
+            else:
+                if min_start < 0 or (ch.t_start >= 0 and ch.t_start < min_start):
+                    min_start = ch.t_start
+                if ch.t_end > max_end:
+                    max_end = ch.t_end
+        # update self and parent node, if necessary
+        self._update_start_end(min_start, max_end)
         return self
 
     def get_edus(self, a_flag = TREE_INTERNAL):
@@ -241,7 +253,8 @@ class RSTTree(object):
         @return list of descendant terminal trees
         """
         ret = []
-
+        print >> sys.stderr, "get_edus: processing tree '{:s}' (is terminal = {:d})".format(self.id, \
+                                                                                                self._terminal)
         if self._terminal:
             ret.append(self)
 
@@ -260,7 +273,7 @@ class RSTTree(object):
 
     def get_subtrees(self, a_flag = TREE_INTERNAL):
         """
-        Return list of descendant trees in sorted order.
+        Return list of all descendant trees in sorted order.
 
         @param a_flag - (optional) flag indicating which descendants (internal
                         or external, or both) should be returned
@@ -270,14 +283,14 @@ class RSTTree(object):
         ret = []
         ret.append(self)
         if a_flag & TREE_INTERNAL:
-            if not self.external or self.etype == "text":
+            if not self.external or self.etype == TERMINAL:
                 for ch in self.ichildren:
                     ret += ch.get_subtrees(a_flag)
                 ret.sort()
         if a_flag & TREE_EXTERNAL:
             for ch in self.echildren:
                 ret += ch.get_subtrees(a_flag)
-            if self.external and self.etype != "text":
+            if self.external and self.etype != TERMINAL:
                 for ch in self.ichildren:
                     ret += ch.get_subtrees(a_flag)
         return ret
@@ -312,12 +325,28 @@ class RSTTree(object):
         """
         return '"' + QUOTE.sub(ESCAPED, a_text) + '"'
 
-    # def _update_parent(self):
-    #     """
-    #     Update parent's start and end attributes if necessary.
+    def _update_tstart_tend(self, a_start, a_end)
+        """
+        Update start and end attributes of current node and its parent, if necessary.
 
-    #     @return \c void
-    #     """
+        @param a_start - new start value
+        @param a_end - new end value
+
+        @return \c void
+        """
+        if self._terminal:
+            if not self.parent is None:
+                self.parent._update_start_end(a_start, a_end, a_external)
+        elif a_external and self.external and self.etype != TERMINAL:
+            changed = False
+            if self.t_start < 0 or self.t_start > a_start:
+                self.t_start = a_start
+                changed = True
+            if self.t_end < 0 or self.t_end < a_end:
+                self.t_end = a_end
+                changed = True
+            if changed and not self.parent is None:
+                self.parent._update_start_end(a_start, a_end, a_external)
     #     if self.parent is None or self.parent.msgid != self.msgid:
     #         return
     #     changed = False
