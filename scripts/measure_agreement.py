@@ -9,7 +9,7 @@ script_name [OPTIONS] src_dir anno_dir1 anno_dir2
 
 ##################################################################
 # Libraries
-from rst import RSTForrest, FIELD_SEP, TREE_INTERNAL, XML_FMT
+from rst import RSTForrest, FIELD_SEP, TREE_EXTERNAL, TREE_INTERNAL, XML_FMT
 
 from collections import defaultdict, Counter
 from itertools import chain
@@ -29,6 +29,8 @@ DIFF_IDX = 1
 NONE = "none"
 SEG = "segment"
 NONSEG = "nonsegment"
+NUCLEUS = "nucleus"
+RELNAME = "relname"
 
 # auxiliary function used for creating initial statistics list
 KAPPA_GEN = lambda: [defaultdict(lambda: Counter()), []] # confusion matrix, list of differences
@@ -39,9 +41,11 @@ KAPPA_STAT = defaultdict(KAPPA_GEN) # total kappa statistics
 # constants specifying which RST elements should be tested
 SEGMENTS = "segments"
 CHCK_SEGMENTS = 1
-NUCLEARITY = "nuclearity"
+MNUCLEARITY = "message nuclearity"
+DNUCLEARITY = "discussion nuclearity"
 CHCK_NUCLEARITY = 2
-RELATIONS = "relations"
+MRELATIONS = "message relations"
+DRELATIONS = "discussion relations"
 CHCK_RELATIONS = 4
 ALL = "all"
 CHCK_ALL = 7
@@ -62,10 +66,10 @@ def _merge_stat(a_trg_stat, a_src_stat):
         stat1 = a_trg_stat[key2]
         confusion1 = stat1[CONFUSION_IDX]
         confusion2 = stat2[CONFUSION_IDX]
-        print >> sys.stderr, "confusion1", repr(confusion1)
-        print >> sys.stderr, "confusion2", repr(confusion2)
+        # print >> sys.stderr, "confusion1", repr(confusion1)
+        # print >> sys.stderr, "confusion2", repr(confusion2)
         for confusion_key2, confusion_stat2 in confusion2.iteritems():
-            print >> sys.stderr, "confusion1[confusion_key2]", repr(confusion1[confusion_key2])
+            # print >> sys.stderr, "confusion1[confusion_key2]", repr(confusion1[confusion_key2])
             confusion1[confusion_key2].update(confusion_stat2)
         stat1[DIFF_IDX] += stat2[DIFF_IDX]
 
@@ -182,18 +186,14 @@ def _update_segment_stat(a_argmnt_stat, a_txt, a_edus1, a_edus2, a_diff = False,
     @return \c void
     """
     # update number of total and overlapping segments
-    bndr1 = set([edu.end for edu in a_edus1])
-    bndr2 = set([edu.end for edu in a_edus2])
-    print >> sys.stderr, "bndr1 =", repr(bndr1)
-    print >> sys.stderr, "bndr2 =", repr(bndr2)
+    bndr1 = set([edu.end[-1] for edu in a_edus1])
+    bndr2 = set([edu.end[-1] for edu in a_edus2])
 
     seg_seg_overlap = len(bndr1 & bndr2)
     total_seg = len(bndr1 | bndr2)
 
     # update counters of EDU boundaries
     confusion_mtx = a_argmnt_stat[CONFUSION_IDX]
-    # print >> sys.stderr, "confusion_mtx[SEG] =", repr(confusion_mtx[SEG])
-    # print >> sys.stderr, "confusion_mtx[SEG][NONSEG] =", repr(confusion_mtx[SEG][NONSEG])
     confusion_mtx[SEG][NONSEG] += len(bndr1) - seg_seg_overlap
     confusion_mtx[NONSEG][SEG] += len(bndr2) - seg_seg_overlap
     confusion_mtx[SEG][SEG] += seg_seg_overlap
@@ -222,10 +222,10 @@ def _update_attr_stat(a_argmnt_stat, a_attr, a_subsegs, a_segs2trees1, a_segs2tr
     tree1 = tree2 = None
     attr1 = attr2 = None
     confusion_mtx = a_argmnt_stat[CONFUSION_IDX]
-    print >> sys.stderr, "_update_attr_stat: a_attr =", repr(a_attr)
-    print >> sys.stderr, "_update_attr_stat: a_subsegs =", repr(a_subsegs)
-    print >> sys.stderr, "_update_attr_stat: a_segs2trees1 =", repr(a_segs2trees1)
-    print >> sys.stderr, "_update_attr_stat: a_segs2trees2 =", repr(a_segs2trees2)
+    # print >> sys.stderr, "_update_attr_stat: a_attr =", repr(a_attr)
+    # print >> sys.stderr, "_update_attr_stat: a_subsegs =", repr(a_subsegs)
+    # print >> sys.stderr, "_update_attr_stat: a_segs2trees1 =", repr(a_segs2trees1)
+    # print >> sys.stderr, "_update_attr_stat: a_segs2trees2 =", repr(a_segs2trees2)
     for sseg in a_subsegs:
         # print >> sys.stderr, "_update_attr_stat: sseg =", repr(sseg)
         tree1 = a_segs2trees1[sseg]
@@ -235,13 +235,15 @@ def _update_attr_stat(a_argmnt_stat, a_attr, a_subsegs, a_segs2trees1, a_segs2tr
         if not tree1:
             if not tree2:
                 confusion_mtx[NONE][NONE] += 1
+            else:
+                confusion_mtx[NONE][getattr(tree2, a_attr)] += 1
         elif not tree2:
             confusion_mtx[getattr(tree1, a_attr)][NONE] += 1
         else:
             attr1 = getattr(tree1, a_attr)
             attr2 = getattr(tree2, a_attr)
             confusion_mtx[attr1][attr2] += 1
-            if attr1 != attr2 and a_diff:
+            if a_diff and attr1 != attr2:
                 a_argmnt_stat[DIFF_IDX].append(tree1.minimal_str(TREE_INTERNAL, a_attr) + \
                                                    "\nvs.\n" + tree2.minimal_str(TREE_INTERNAL, \
                                                                                      a_attr))
@@ -257,23 +259,38 @@ def _get_subtrees(a_rsttrees):
     ret = []
     for irsttree in a_rsttrees:
         for subtree in irsttree.get_subtrees():
-            ret.append(((subtree.t_start, subtree.t_end), subtree))
+            ret.append(((subtree.start, subtree.end), subtree))
     return ret
 
-def _get_messages(a_thread, a_messages):
+def _get_messages(a_thread, a_start_id, a_msgid2txt, a_msgid2discid):
     """
     Populate dictionary of messages
 
     @param a_thread - XML element representing whole thread
-    @param a_messages - dictionary in which to store the thread messages
-    """
-    for imsg in a_thread.iterfind('msg'):
-        a_messages[imsg.get("id")] = imsg.find("text").text.encode(ENCODING).strip()
-        for chmsg in imsg.iterfind('msg'):
-            _get_messages(chmsg, a_messages)
+    @param a_start_id - serial number to start the numbering of
+                        messages from
+    @param a_msgid2txt - dictionary in which to store the text of the
+                         messages
+    @param a_msgid2discid - dictionary for storing mapping from message
+                        ids to their serial numbers
 
-def _update_stat(a_argmnt_stat, a_rsttrees1, a_rsttrees2, a_msgid, a_txt, a_chck_flags, \
-                     a_diff, a_sgm_strict):
+    @return \c next serial message number to use
+    """
+    txt = ""
+    msgid = None
+    for imsg in a_thread.findall('msg'):
+        # remember current message
+        msgid = imsg.get("id")
+        txt = imsg.find("text").text.encode(ENCODING).strip()
+        a_msgid2txt[msgid] = txt
+        a_msgid2discid[msgid] = a_start_id
+        a_start_id += 1
+        # recursively process children
+        a_start_id = _get_messages(imsg, a_start_id, a_msgid2txt, a_msgid2discid)
+    return a_start_id
+
+def _update_stat(a_argmnt_stat, a_rsttrees1, a_rsttrees2, a_msgid, a_txt, \
+                     a_chck_flags, a_diff, a_sgm_strict, a_external = False):
     """
     Measure agreement of two RST trees.
 
@@ -286,12 +303,23 @@ def _update_stat(a_argmnt_stat, a_rsttrees1, a_rsttrees2, a_msgid, a_txt, a_chck
     @param a_diff - flag specifying whether differences should be generated
     @param a_sgm_strict - flag indicating whether segment agreement should
                        apply strict metric
+    @param a_external - flag indicating whether internal or external trees
+                        are checked
 
     @return \c void
 
     """
-    edus1 = [edu for rsttree in a_rsttrees1 for edu in rsttree.get_edus()]
-    edus2 = [edu for rsttree in a_rsttrees2 for edu in rsttree.get_edus()]
+    # print >> sys.stderr, "msgid =", a_msgid
+    if a_external:
+        nuc_key = DNUCLEARITY
+        rel_key = DRELATIONS
+        edu_flags = TREE_EXTERNAL
+    else:
+        nuc_key = MNUCLEARITY
+        rel_key = MRELATIONS
+        edu_flags = TREE_INTERNAL
+    edus1 = [edu for rsttree in a_rsttrees1 for edu in rsttree.get_edus(edu_flags)]
+    edus2 = [edu for rsttree in a_rsttrees2 for edu in rsttree.get_edus(edu_flags)]
     # estimate agreement on segment boundaries
     if a_chck_flags & CHCK_SEGMENTS:
         _update_segment_stat(a_argmnt_stat[SEGMENTS], a_txt, edus1, edus2, \
@@ -310,24 +338,25 @@ def _update_stat(a_argmnt_stat, a_rsttrees1, a_rsttrees2, a_msgid, a_txt, a_chck
         # position as the first element and all succeeding end positions as the
         # second elements
         for start_i in starts:
-            assert start_i >= 0, "Invalid start of RSTTree: {:d}".format(start_i)
+            assert start_i[0] >= 0, "Invalid start of RSTTree: {:d}".format(repr(start_i))
             while j_end < len(ends) and ends[j_end] <= start_i:
                 j_end += 1
             for end_j in ends[j_end:]:
-                assert end_j >= 0, "Invalid start of RSTTree: {:d}".format(end_j)
+                assert end_j[0] >= 0, "Invalid start of RSTTree: {:d}".format(repr(end_j))
                 subsegs.append((start_i, end_j))
-        print >> sys.stderr, "subsegs = ", repr(subsegs)
+        # print >> sys.stderr, "starts =", starts
+        # print >> sys.stderr, "ends =", ends
+        # print >> sys.stderr, "subsegs = ", repr(subsegs)
         segs2trees1 = defaultdict(lambda: None, _get_subtrees(a_rsttrees1))
         segs2trees2 = defaultdict(lambda: None, _get_subtrees(a_rsttrees2))
-        print >> sys.stderr, "segs2trees1 = ", repr(segs2trees1)
-        print >> sys.stderr, "segs2trees2 = ", repr(segs2trees2)
-        sys.exit(66)
-
+        # print >> sys.stderr, "segs2trees1 = ", repr(segs2trees1)
+        # print >> sys.stderr, "segs2trees2 = ", repr(segs2trees2)
+        # sys.exit(66)
         if a_chck_flags & CHCK_NUCLEARITY:
-            _update_attr_stat(a_argmnt_stat[NUCLEARITY], "nucleus", subsegs, segs2trees1, \
+            _update_attr_stat(a_argmnt_stat[nuc_key], NUCLEUS, subsegs, segs2trees1, \
                                   segs2trees2, a_diff)
         if a_chck_flags & CHCK_RELATIONS:
-            _update_attr_stat(a_argmnt_stat[RELATIONS], "relname", subsegs, segs2trees1, \
+            _update_attr_stat(a_argmnt_stat[rel_key], RELNAME, subsegs, segs2trees1, \
                                   segs2trees2, a_diff)
 
 def update_stat(a_src_fname, a_anno1_fname, a_anno2_fname, a_chck_flags, a_diff = False, \
@@ -349,22 +378,26 @@ def update_stat(a_src_fname, a_anno1_fname, a_anno2_fname, a_chck_flags, a_diff 
 
     """
     global KAPPA_STAT
+
     # read messages
-    messages = {}
-    srctree = ET.parse(a_src_fname).getroot()
+    start_id = 0; msgid2discid = {}; messages = {}
     print >> sys.stderr, "Processing file: '{:s}'".format(a_src_fname)
+    srctree = ET.parse(a_src_fname).getroot()
     for ithread in srctree.iter('thread'):
-        _get_messages(ithread, messages)
+        start_id = _get_messages(ithread, start_id, messages, msgid2discid)
+
     # read first annotation file
-    rstForrest1 = RSTForrest(a_file_fmt)
+    rstForrest1 = RSTForrest(a_file_fmt, msgid2discid)
     rstForrest1.parse(a_anno1_fname)
+
     # read second annotation file
-    rstForrest2 = RSTForrest(a_file_fmt)
+    rstForrest2 = RSTForrest(a_file_fmt, msgid2discid)
     rstForrest2.parse(a_anno2_fname)
-    # perform neccessary agreement tests
+
+    # perform neccessary agreement tests on the level of single messages
     skip = False
     agrmt_stat = defaultdict(KAPPA_GEN)
-    for msg_id, msg in messages.iteritems():
+    for msg_id, _ in messages.iteritems():
         skip = False
         if msg_id not in rstForrest1.msgid2iroots:
             print >> sys.stderr, \
@@ -377,12 +410,28 @@ def update_stat(a_src_fname, a_anno1_fname, a_anno2_fname, a_chck_flags, a_diff 
         if skip:
             continue
         _update_stat(agrmt_stat, rstForrest1.msgid2iroots[msg_id], rstForrest2.msgid2iroots[msg_id], \
-                         msg_id, messages[msg_id], a_chck_flags, a_diff, a_sgm_strict)
-        # delete both lines
-        # output_stat(agrmt_stat, sys.stdout, "Statistics on file {:s}".format(a_src_fname))
-        # sys.exit(66)
+                         msg_id, msgid2discid[msg_id], messages[msg_id], a_chck_flags, a_diff, a_sgm_strict)
+    # align discussion trees from two files
+    msgid2dtree = defaultdict(lambda: (list(), list()))
+    for itree in rstForrest1.trees:
+        msgid2dtree[itree.msgid][0].append(itree)
+    for itree in rstForrest2.trees:
+        msgid2dtree[itree.msgid][-1].append(itree)
+    # perform neccessary agreement tests on the level of complete dicussions
+    for msg_id, (trees1, trees2) in msgid2dtree.iteritems():
+        if len(trees1) == len(trees2):
+            for t1, t2 in zip(sorted(trees1), sorted(trees2)):
+                _update_stat(agrmt_stat, t1, t1, msg_id, msgid2discid[msg_id], messages[msg_id], a_chck_flags, a_diff, a_sgm_strict)
+    # if a_chck_flags & CHCK_NUCLEARITY:
+    #     _update_attr_stat(a_argmnt_stat[DNUCLEARITY], NUCLEUS, subsegs, segs2trees1, \
+    #                           segs2trees2, a_diff)
+    # if a_chck_flags & CHCK_RELATIONS:
+    #     _update_attr_stat(a_argmnt_stat[DRELATIONS], RELNAME, subsegs, segs2trees1, \
+    #                           segs2trees2, a_diff)
+    # print per file statistics, if necessary
     if a_verbose:
         output_stat(agrmt_stat, sys.stdout, "Statistics on file {:s}".format(a_src_fname))
+    # merge new statistics with an already computed one
     _merge_stat(KAPPA_STAT, agrmt_stat)
 
 def main(argv):

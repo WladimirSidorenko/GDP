@@ -21,7 +21,7 @@ RSTTree - class representing single RST tree
 # Imports
 from constants import ENCODING, LIST_SEP, FIELD_SEP, VALUE_SEP, \
     XML_FMT, TREE_INTERNAL, TREE_EXTERNAL, TREE_ALL, \
-    NUC_RELS, _CHILDREN, _TEXT, _OFFSETS
+    TERMINAL, NUC_RELS, _CHILDREN, _TEXT, _OFFSETS
 from exceptions import RSTBadFormat, RSTBadLogic, RSTBadStructure
 
 import re
@@ -42,14 +42,19 @@ class RSTTree(object):
     Instance Variables:
     id - id of the root node
     msgid - id of the message to which this tree belongs
-    parent - tree's parent tree
+    discid - id of the message in discussion
+    parent - pointer to the parent tree
     relname - relation connecting this tree to its parent
     ichildren - internal child trees (those which pertain to the same message)
     echildren - external child trees (those which pertain to other messages)
 
-    type - type of this tree (can be either `text' or `span')
-    start - start offset of the text (for terminal trees)
-    end - end offset of the text (for terminal trees)
+    type - type of this tree (can be either `text' (TERMINAL) or `span' (NONTERMINAL))
+    start - start offset of the text
+    end - end offset of the text
+    t_start - start offset of the underlying subtree
+    t_end - end offset of the underlying subtree
+    terminal - boolean value indicating whether given node is terminal
+               or not
     text - actual text of terminal tree (for terminal trees)
 
     Methods:
@@ -72,6 +77,7 @@ class RSTTree(object):
         """
         self.id = a_id
         self.msgid = None
+        self.discid = -1
         self.parent = None
         self.relname = None
         self.etype = None
@@ -80,12 +86,12 @@ class RSTTree(object):
         self.ichildren = set()
         self.nucleus = False
         self.type = None
-        self.start = -1
-        self.end = -1
-        self.t_start = -1        # start position of the whole subtree
-        self.t_end = -1          # end position of the whole subtree
+        self.start = (-1, -1)
+        self.end = (-1, -1)
+        self.t_start = (-1, -1) # start position of the whole subtree
+        self.t_end = (-1, -1)   # end position of the whole subtree
         self.text = ""
-        self._terminal = False
+        self.terminal = False
         # nestedness level of this tree (used in print function)
         self._nestedness = 0
         self.update(**a_attrs)
@@ -104,7 +110,7 @@ class RSTTree(object):
 
     def __ne__(self, a_other):
         """
-        Compare given tree with another one and return true if they are not same.
+        Compare given tree with another one and return true if they are not the same.
 
         @param a_other - tree to compare with
 
@@ -120,8 +126,6 @@ class RSTTree(object):
 
         @return \c integer lesser than, equal to, or greater than 0
         """
-        # print >> sys.stderr, repr(self)
-        # print >> sys.stderr, repr(a_other)
         ret = cmp(self.t_start, a_other.t_start)
         if ret == 0:
             return cmp(self.t_end, a_other.t_end)
@@ -146,8 +150,8 @@ class RSTTree(object):
         ret += u" (type " + self._escape_text(self.type or "") + ")"
         if self.relname:
             ret += u" (relname " + self._escape_text(self.relname) + ")"
-        if self._terminal or self.start >= 0:
-            self._terminal = True
+        if self.terminal or self.start >= 0:
+            self.terminal = True
             ret += u" (start " + unicode(self.start) + ")"
             ret += u" (end " + unicode(self.end) + ")"
             ret += u" (text " + self._escape_text(self.text) + ")"
@@ -186,7 +190,7 @@ class RSTTree(object):
                     avalue = getattr(attr, None)
                     if avalue is not None:
                         ret += " (" + attr + ' ' + avalue + ')'
-        if self._terminal:
+        if self.terminal:
             ret += u" (text " + self._escape_text(self.text) + ")"
         else:
             ret += u"..."
@@ -217,30 +221,21 @@ class RSTTree(object):
         """
         changed = False
         external = bool(self.external and self.etype != TERMINAL)
-        min_start = max_end = -1
+        min_start = max_end = (-1, -1)
         for ch in a_children:
             # update lists of children
-            if ch.msgid is None or ch.msgid == self.msgid:
+            if ch.msgid == self.msgid:
                 self.ichildren.add(ch)
             else:
                 self.echildren.add(ch)
-            if self.external and
-            # update minimum start and maximum character offsets available from
+            # update minimum start and maximum positions available from
             # children
-            if external:
-                # update minimum start and maximum character offsets available from
-                # children
-                if min_start < 0 or ch.id < min_start:
-                    min_start = ch.id
-                if max_end < 0 or ch.id > max_end:
-                    max_end = ch.id
-            else:
-                if min_start < 0 or (ch.t_start >= 0 and ch.t_start < min_start):
-                    min_start = ch.t_start
-                if ch.t_end > max_end:
-                    max_end = ch.t_end
-        # update self and parent node, if necessary
-        self._update_start_end(min_start, max_end)
+            if ch.t_start[0] > -1 and (min_start[0] < 0 or min_start > ch.t_start):
+                min_start = ch.t_start
+            if ch.t_end > max_end:
+                max_end = ch.t_end
+        # update `start` and `end` values of self and parent, if necessary
+        self._update_tstart_tend(min_start, max_end)
         return self
 
     def get_edus(self, a_flag = TREE_INTERNAL):
@@ -253,20 +248,18 @@ class RSTTree(object):
         @return list of descendant terminal trees
         """
         ret = []
-        print >> sys.stderr, "get_edus: processing tree '{:s}' (is terminal = {:d})".format(self.id, \
-                                                                                                self._terminal)
-        if self._terminal:
+        if self.terminal:
             ret.append(self)
 
         if a_flag & TREE_INTERNAL:
-            if not self.external or self.etype == "text":
+            if not self.external or self.etype == TERMINAL:
                 for ch in self.ichildren:
                     ret += ch.get_edus(a_flag)
                 ret.sort(key = lambda edu: edu.start)
         if a_flag & TREE_EXTERNAL:
             for ch in self.echildren:
                 ret += ch.get_edus(a_flag)
-            if self.external and self.etype != "text":
+            if self.external and self.etype != TERMINAL:
                 for ch in self.ichildren:
                     ret += ch.get_edus(a_flag)
         return ret
@@ -287,6 +280,10 @@ class RSTTree(object):
                 for ch in self.ichildren:
                     ret += ch.get_subtrees(a_flag)
                 ret.sort()
+            else:
+                for ch in self.ichildren:
+                    if ch.msgid == self.msgid:
+                        return ch.get_subtrees()
         if a_flag & TREE_EXTERNAL:
             for ch in self.echildren:
                 ret += ch.get_subtrees(a_flag)
@@ -308,11 +305,11 @@ class RSTTree(object):
                 setattr(self, k, v)
         # set private variables and convert types of some attributes
         if self.type == "segment":
-            self._terminal = True
+            self.terminal = True
             self.t_start = self.start = int(self.start)
             self.t_end = self.end = int(self.end)
         else:
-            self._terminal = False
+            self.terminal = False
         self.external = int(self.external)
 
     def _escape_text(self, a_text):
@@ -325,41 +322,32 @@ class RSTTree(object):
         """
         return '"' + QUOTE.sub(ESCAPED, a_text) + '"'
 
-    def _update_tstart_tend(self, a_start, a_end)
+    def _update_tstart_tend(self, a_start, a_end):
         """
-        Update start and end attributes of current node and its parent, if necessary.
+        Update `t_start` and `t_end` attributes.
 
-        @param a_start - new start value
-        @param a_end - new end value
+        @param a_start - new `t_start` value
+        @param a_end - new `t_end` value
 
         @return \c void
         """
-        if self._terminal:
-            if not self.parent is None:
-                self.parent._update_start_end(a_start, a_end, a_external)
-        elif a_external and self.external and self.etype != TERMINAL:
-            changed = False
-            if self.t_start < 0 or self.t_start > a_start:
-                self.t_start = a_start
-                changed = True
-            if self.t_end < 0 or self.t_end < a_end:
-                self.t_end = a_end
-                changed = True
-            if changed and not self.parent is None:
-                self.parent._update_start_end(a_start, a_end, a_external)
-    #     if self.parent is None or self.parent.msgid != self.msgid:
-    #         return
-    #     changed = False
-    #     if self.t_start >= 0 and (self.parent.t_start < 0 or self.parent.t_start > self.t_start):
-    #         changed = True
-    #         self.parent.t_start = self.t_start
-
-    #     if self.t_end >= 0 and (self.parent.t_end < 0 or self.parent.t_end < self.t_end):
-    #         changed = True
-    #         self.parent.t_end = self.t_end
-
-    #     if changed:
-    #         self.parent._update_parent()
+        update = False
+        # check if new `t_start` value should be updated
+        if a_start[0] > -1 and (self.t_start[0] < 0 or a_start < self.t_start):
+            update = True
+            self.t_start = a_start
+        if a_end > self.t_end:
+            update = True
+            self.t_end = a_end
+        # update `start` and `end` values of non-terminal nodes
+        if update and not self.terminal:
+            if a_start[0] == self.discid or (self.external and self.etype != TERMINAL):
+                self.start = self.t_start
+            if a_end[0] == self.discid or (self.external and self.etype != TERMINAL):
+                self.end = self.t_end
+        # propagate new `t_start`, `t_end` values to the parent
+        if update and self.parent is not None:
+            self.parent._update_tstart_tend(a_start, a_end)
 
     def _unicode_children(self, a_children):
         """

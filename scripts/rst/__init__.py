@@ -15,6 +15,7 @@ LSP_FMT - flag for s-expression format
 PC3_FMT - flag for PC3 (SGML) format
 XML_FMT - flag for XML format
 TERMINAL - string representing that given node is of terminal type
+NONTERMINAL - string representing that given node is of nonterminal type
 TREE_INTERNAL - flag indicating that only internal tree nodes
           should be processed
 TREE_EXTERNAL - flag indicating that only external tree nodes
@@ -34,7 +35,7 @@ RSTBadFormat - raised when attempting to parse an incorrect line
 RSTBadLogic - raised when when illegitimate operation is attempted
 RSTBadStructure - raised when data structure to be read appears to be broken
 
-@author = Uladzimir Sidarenka
+@author = Wladimir Sidorenko (Uladzimir Sidarenka)
 @mail = <sidarenk at uni dash potsdam dot de>
 @version = 0.0.1
 
@@ -43,8 +44,8 @@ RSTBadStructure - raised when data structure to be read appears to be broken
 ##################################################################
 # Imports
 from constants import ENCODING, LIST_SEP, FIELD_SEP, VALUE_SEP, \
-    LSP_FMT, XML_FMT, PC3_FMT, TREE_INTERNAL, TREE_EXTERNAL, \
-    TREE_ALL, NUC_RELS
+    LSP_FMT, XML_FMT, PC3_FMT, TERMINAL, NONTERMINAL, TREE_INTERNAL, \
+    TREE_EXTERNAL, TREE_ALL, NUC_RELS
 
 from exceptions import RSTException, RSTBadFormat, RSTBadLogic, RSTBadStructure
 
@@ -58,6 +59,6 @@ __all__ = ["ENCODING", "LIST_SEP", "FIELD_SEP", "VALUE_SEP", \
                "TREE_INTERNAL", "TREE_EXTERNAL", "TREE_ALL", "NUC_RELS", \
                "RSTForrest", "RSTTree", \
                "RSTException", "RSTBadFormat", "RSTBadStructure"]
-__author__ = "Uladzimir Sidarenka"
+__author__ = "Wladimir Sidorenko (Uladzimir Sidarenka)"
 __email__ = "sidarenk at uni dash potsdam dot de"
-__version__ = '0.0.1'
+__version__ = "0.0.1"

@@ -18,6 +18,7 @@ from exceptions import RSTBadFormat, RSTBadStructure
 from rsttree import RSTTree
 
 from collections import defaultdict
+from itertools import chain
 
 import sys
 
@@ -30,6 +31,8 @@ class RSTForrest(object):
     Variables:
     trees - set of most prominent RST trees
     msgid2iroots - mapping from message id to its corresponding (sub-)tree
+    msgid2discid - dictionary mapping message id to its current number in
+               discussions
 
     Methods:
     clear - public method for re-setting data
@@ -37,14 +40,21 @@ class RSTForrest(object):
 
     """
 
-    def __init__(self, a_fmt = XML_FMT):
+    def __init__(self, a_fmt = XML_FMT, a_msgid2discid = None):
         """
         Class constructor.
 
         @param a_fmt - format of input data
+        @param a_msgid2discid - dictionary mapping message id to its current
+                        number in discussions
+
         """
         self.trees = set()
         self.msgid2iroots = defaultdict(set)
+        if a_msgid2discid is None:
+            self.msgid2discid = defaultdict(lambda: 0)
+        else:
+            self.msgid2discid = a_msgid2discid
         # mapping from node id to its corresponding tree
         self._nid2tree = {}
         # mapping from node id to the id of its corresponding message
@@ -104,22 +114,22 @@ class RSTForrest(object):
         idoc = ET.parse(a_file).getroot()
         # read segments and spans
         iid = -1; itree = None
-        inodes = [iseg for iseg in idoc.iterfind("segments/segment")] + \
-            sorted([ispan for ispan in idoc.iterfind("spans/span")], key = lambda s: s.get("id"))
+        inodes = chain(idoc.iterfind("segments/segment"), idoc.iterfind("spans/span"))
         for inode in inodes:
             iid = inode.attrib.pop("id")
             inode.attrib["type"] = inode.tag
-            # print >> sys.stderr, "_parse_xml: iid =", iid
-            # print >> sys.stderr, "_parse_xml: inode.attrib =", repr(inode.attrib)
+            inode.attrib["discid"] = self.msgid2discid[inode.attrib.get("msgid")]
+            # get/create appropriate tree for the given node id
             itree = RSTTree(iid, **inode.attrib)
-            # update offset information
-            if not itree._terminal and (itree.external == 0 or itree.etype == "text"):
-                itree.t_start = self._nid2tree[itree.start].start
-                itree.t_end = self._nid2tree[itree.end].end
             self._nid2tree[iid] = itree
-            self._nid2msgid[iid] = itree.msgid
             self.trees.add(itree)
-            # print >> sys.stderr, "_parse_xml: itree.msgid =", itree.msgid
+            self._nid2msgid[iid] = itree.msgid
+            # set `t_start` and `t_end` of terminal nodes
+            if itree.terminal:
+                itree.start = itree.t_start = (self.msgid2discid[itree.msgid], itree.start)
+                itree.end = itree.t_end = (self.msgid2discid[itree.msgid], itree.end)
+            else:
+                itree.start = itree.end = (-1, -1)
             if not itree.external or itree.etype == TERMINAL:
                 self.msgid2iroots[itree.msgid].add(itree)
         # read hypotactic relations
@@ -131,22 +141,20 @@ class RSTForrest(object):
             nuc_id = irel.find("nucleus").get("idref"); nuc_tree = self._nid2tree[nuc_id]
             sat_id = irel.find("satellite").get("idref"); sat_tree = self._nid2tree[sat_id]
             # update parent and child information of nucleus and satellite
-            nuc_tree.relation = "span"; nuc_tree.parent = span_tree; nuc_tree.nucleus = True
-            sat_tree.relation = irel.get("relname"); sat_tree.parent = nuc_tree; sat_tree.nucleus = False
+            nuc_tree.relname = "span"; nuc_tree.parent = span_tree; nuc_tree.nucleus = True
+            sat_tree.relname = irel.get("relname"); sat_tree.parent = nuc_tree; sat_tree.nucleus = False
             # update child information of nucleus and span
             nuc_tree.add_children(sat_tree)
             span_tree.add_children(nuc_tree)
             # remove nucleus and satellite from the list of tree roots
-            print >> sys.stderr, "_parse_xml: discarding tree ", sat_tree.id
-            print >> sys.stderr, "_parse_xml: discarding tree ", nuc_tree.id
             self.trees.discard(sat_tree); self.trees.discard(nuc_tree)
             # remove nucleus and satellite from the list of internal message tree roots
-            if nuc_tree.msgid == sat_tree.msgid and nuc_tree.msgid == span_tree.msgid:
+            if nuc_tree.msgid == span_tree.msgid:
                 iroots = self.msgid2iroots[nuc_tree.msgid]
                 iroots.discard(sat_tree); iroots.discard(nuc_tree)
         # read paratactic relations
-        internal = False
         relname = ""
+        internal = False
         for irel in idoc.iterfind(".//parRelation"):
             relname = irel.get("relname")
             span_id = irel.find("spannode").get("idref"); span_tree = self._nid2tree[span_id]
