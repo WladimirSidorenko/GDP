@@ -21,7 +21,7 @@ RSTTree - class representing single RST tree
 # Imports
 from constants import ENCODING, LIST_SEP, FIELD_SEP, VALUE_SEP, \
     XML_FMT, TREE_INTERNAL, TREE_EXTERNAL, TREE_ALL, \
-    TERMINAL, NUC_RELS, _CHILDREN, _TEXT, _OFFSETS
+    TERMINAL, NONTERMINAL, NUC_RELS, _CHILDREN, _TEXT, _OFFSETS
 from exceptions import RSTBadFormat, RSTBadLogic, RSTBadStructure
 
 import re
@@ -55,10 +55,12 @@ class RSTTree(object):
     t_end - end offset of the underlying subtree
     terminal - boolean value indicating whether given node is terminal
                or not
-    text - actual text of terminal tree (for terminal trees)
+    text - actual text of terminal node
 
     Methods:
     add_children - add child trees
+    adjust_offsets - adjust offsets of terminal nodes to exclude trailining and
+                     leading whitespaces
     get_edus - return list of descendant terminal trees
     get_subtrees - return list of all descendants (by default, only internal
              subtrees are returned)
@@ -238,6 +240,27 @@ class RSTTree(object):
         self._update_tstart_tend(min_start, max_end)
         return self
 
+    def adjust_offsets(self):
+        """
+        Adjust offsets of terminal nodes to remove leading and trailing whitespaces.
+
+        @return \c void
+        """
+        if not self.terminal or not self.text:
+            return
+        assert self.start == self.t_start and self.t_start[0] > -1, "start and t_start fields of\
+ RST terminal diverged before `adjust_offsets was called`"
+        assert self.end == self.t_end and self.t_end[0] > -1, "end and t_end fields of RST\
+ terminal diverged before `adjust_offsets was called`"
+        orig_len = len(self.text)
+        self.text = self.text.lstrip()
+        delta_start = orig_len - len(self.text)
+        orig_len = len(self.text)
+        self.text = self.text.rstrip()
+        delta_end = orig_len - len(self.text)
+        self.start = self.t_start = (self.t_start[0], self.t_start[-1] + delta_start)
+        self.end = self.t_end = (self.t_end[0], self.t_end[-1] - delta_end)
+
     def get_edus(self, a_flag = TREE_INTERNAL):
         """
         Return list of descendant terminal trees in sorted order.
@@ -250,18 +273,15 @@ class RSTTree(object):
         ret = []
         if self.terminal:
             ret.append(self)
-
-        if a_flag & TREE_INTERNAL:
-            if not self.external or self.etype == TERMINAL:
-                for ch in self.ichildren:
-                    ret += ch.get_edus(a_flag)
-                ret.sort(key = lambda edu: edu.start)
+        # external EDUs subsume internal ones
+        if a_flag & TREE_EXTERNAL or not self.external or self.etype == TERMINAL:
+            for ch in self.ichildren:
+                ret += ch.get_edus(a_flag)
+        # additionally, external EDUs also include external children
         if a_flag & TREE_EXTERNAL:
             for ch in self.echildren:
                 ret += ch.get_edus(a_flag)
-            if self.external and self.etype != TERMINAL:
-                for ch in self.ichildren:
-                    ret += ch.get_edus(a_flag)
+        ret.sort(key = lambda edu: edu.start)
         return ret
 
     def get_subtrees(self, a_flag = TREE_INTERNAL):
@@ -305,10 +325,12 @@ class RSTTree(object):
                 setattr(self, k, v)
         # set private variables and convert types of some attributes
         if self.type == "segment":
+            self.type = TERMINAL
             self.terminal = True
             self.t_start = self.start = int(self.start)
             self.t_end = self.end = int(self.end)
         else:
+            self.type = NONTERMINAL
             self.terminal = False
         self.external = int(self.external)
 

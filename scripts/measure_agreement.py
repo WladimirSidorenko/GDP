@@ -41,14 +41,18 @@ KAPPA_STAT = defaultdict(KAPPA_GEN) # total kappa statistics
 # constants specifying which RST elements should be tested
 SEGMENTS = "segments"
 CHCK_SEGMENTS = 1
-MNUCLEARITY = "message nuclearity"
-DNUCLEARITY = "discussion nuclearity"
-CHCK_NUCLEARITY = 2
-MRELATIONS = "message relations"
-DRELATIONS = "discussion relations"
-CHCK_RELATIONS = 4
+MNUCLEARITY = "message_nuclearity"
+CHCK_MNUCLEARITY = 2
+DNUCLEARITY = "discussion_nuclearity"
+CHCK_DNUCLEARITY = 4
+CHCK_NUCLEARITY = CHCK_MNUCLEARITY | CHCK_DNUCLEARITY
+MRELATIONS = "message_relations"
+CHCK_MRELATIONS = 8
+DRELATIONS = "discussion_relations"
+CHCK_DRELATIONS = 16
+CHCK_RELATIONS = CHCK_MRELATIONS | CHCK_DRELATIONS
 ALL = "all"
-CHCK_ALL = 7
+CHCK_ALL = 31
 
 ##################################################################
 # Methods
@@ -115,7 +119,7 @@ def output_stat(a_stat = KAPPA_STAT, a_ostream = sys.stderr, a_header = ""):
         print >> a_ostream, a_header
 
     print >> a_ostream, \
-        "{:15s}{:15s}{:15s}{:15s}{:15s}{:15s}".format("Element", "Overlap", "Markables1", \
+        "{:25s}{:15s}{:15s}{:15s}{:15s}{:15s}".format("Element", "Overlap", "Markables1", \
                                                           "Markables2", "Total", "Kappa")
     confusion_mtx = None
     marginals1 = Counter()
@@ -138,7 +142,7 @@ def output_stat(a_stat = KAPPA_STAT, a_ostream = sys.stderr, a_header = ""):
         # print >> sys.stderr, "marginals1 =", repr(marginals1)
         # print >> sys.stderr, "marginals2 =", repr(marginals2)
         kappa = _compute_kappa(overlap, marginals1, marginals2, total)
-        print >> a_ostream, "{:15s}{:<15d}{:<15d}{:<15d}{:<15d}{:<15.2%}".format(\
+        print >> a_ostream, "{:25s}{:<15d}{:<15d}{:<15d}{:<15d}{:<15.2%}".format(\
             elname, overlap, sum(marginals1.values()), sum(marginals2.values()), total, kappa)
         if elstat[DIFF_IDX]:
             for d in elstat[DIFF_IDX]:
@@ -272,7 +276,7 @@ def _get_messages(a_thread, a_start_id, a_msgid2txt, a_msgid2discid):
     @param a_msgid2txt - dictionary in which to store the text of the
                          messages
     @param a_msgid2discid - dictionary for storing mapping from message
-                        ids to their serial numbers
+                        id's to their serial numbers in the discussions
 
     @return \c next serial message number to use
     """
@@ -289,35 +293,39 @@ def _get_messages(a_thread, a_start_id, a_msgid2txt, a_msgid2discid):
         a_start_id = _get_messages(imsg, a_start_id, a_msgid2txt, a_msgid2discid)
     return a_start_id
 
-def _update_stat(a_argmnt_stat, a_rsttrees1, a_rsttrees2, a_msgid, a_txt, \
-                     a_chck_flags, a_diff, a_sgm_strict, a_external = False):
+def _update_stat(a_argmnt_stat, a_rsttrees1, a_rsttrees2, a_txt, \
+                     a_chck_flags, a_diff, a_sgm_strict):
     """
     Measure agreement of two RST trees.
 
     @param a_argmnt_stat - dictionary with agreement statistics to be updated
     @param a_rsttrees1 - RST trees from 1-st annotation
     @param a_rsttrees2 - RST trees from 2-nd annotation
-    @param a_msgid - id of the message to be annnotated
     @param a_txt - raw text of the trees
     @param a_chck_flags - flags specifying which elements should be tested
     @param a_diff - flag specifying whether differences should be generated
     @param a_sgm_strict - flag indicating whether segment agreement should
                        apply strict metric
-    @param a_external - flag indicating whether internal or external trees
-                        are checked
 
     @return \c void
 
     """
-    # print >> sys.stderr, "msgid =", a_msgid
-    if a_external:
-        nuc_key = DNUCLEARITY
-        rel_key = DRELATIONS
-        edu_flags = TREE_EXTERNAL
-    else:
+    # check flags
+    assert not a_chck_flags & (CHCK_MRELATIONS | CHCK_MNUCLEARITY) or \
+        not a_chck_flags & (CHCK_DRELATIONS | CHCK_DNUCLEARITY) , """Can't\
+ simultaneously check for internal and external nuclearity and relations."""
+    assert not a_chck_flags & CHCK_SEGMENTS or  \
+        not a_chck_flags & (CHCK_DRELATIONS | CHCK_DNUCLEARITY) , """Can't\
+ simultaneously check for segments and external nuclearity and relations."""
+    # set necessary variables
+    if a_chck_flags & (CHCK_MRELATIONS | CHCK_MNUCLEARITY):
         nuc_key = MNUCLEARITY
         rel_key = MRELATIONS
         edu_flags = TREE_INTERNAL
+    else:
+        nuc_key = DNUCLEARITY
+        rel_key = DRELATIONS
+        edu_flags = TREE_EXTERNAL
     edus1 = [edu for rsttree in a_rsttrees1 for edu in rsttree.get_edus(edu_flags)]
     edus2 = [edu for rsttree in a_rsttrees2 for edu in rsttree.get_edus(edu_flags)]
     # estimate agreement on segment boundaries
@@ -380,54 +388,56 @@ def update_stat(a_src_fname, a_anno1_fname, a_anno2_fname, a_chck_flags, a_diff 
     global KAPPA_STAT
 
     # read messages
+    agrmt_stat = defaultdict(KAPPA_GEN)
     start_id = 0; msgid2discid = {}; messages = {}
     print >> sys.stderr, "Processing file: '{:s}'".format(a_src_fname)
     srctree = ET.parse(a_src_fname).getroot()
     for ithread in srctree.iter('thread'):
         start_id = _get_messages(ithread, start_id, messages, msgid2discid)
-
     # read first annotation file
-    rstForrest1 = RSTForrest(a_file_fmt, msgid2discid)
+    rstForrest1 = RSTForrest(a_file_fmt, messages, msgid2discid)
     rstForrest1.parse(a_anno1_fname)
 
     # read second annotation file
-    rstForrest2 = RSTForrest(a_file_fmt, msgid2discid)
+    rstForrest2 = RSTForrest(a_file_fmt, messages, msgid2discid)
     rstForrest2.parse(a_anno2_fname)
 
     # perform neccessary agreement tests on the level of single messages
-    skip = False
-    agrmt_stat = defaultdict(KAPPA_GEN)
-    for msg_id, _ in messages.iteritems():
+    chck_flags = a_chck_flags & (CHCK_SEGMENTS | CHCK_MNUCLEARITY | CHCK_MRELATIONS)
+    if chck_flags:
         skip = False
-        if msg_id not in rstForrest1.msgid2iroots:
-            print >> sys.stderr, \
-                """WARNING: Message {:s} was not annotated by the 1-st annotator""".format(msg_id)
-            skip = True
-        if msg_id not in rstForrest2.msgid2iroots:
-            print >> sys.stderr, \
-                """WARNING: Message {:s} was not annotated by the 2-nd annotator""".format(msg_id)
-            skip = True
-        if skip:
-            continue
-        _update_stat(agrmt_stat, rstForrest1.msgid2iroots[msg_id], rstForrest2.msgid2iroots[msg_id], \
-                         msg_id, msgid2discid[msg_id], messages[msg_id], a_chck_flags, a_diff, a_sgm_strict)
-    # align discussion trees from two files
-    msgid2dtree = defaultdict(lambda: (list(), list()))
-    for itree in rstForrest1.trees:
-        msgid2dtree[itree.msgid][0].append(itree)
-    for itree in rstForrest2.trees:
-        msgid2dtree[itree.msgid][-1].append(itree)
-    # perform neccessary agreement tests on the level of complete dicussions
-    for msg_id, (trees1, trees2) in msgid2dtree.iteritems():
-        if len(trees1) == len(trees2):
-            for t1, t2 in zip(sorted(trees1), sorted(trees2)):
-                _update_stat(agrmt_stat, t1, t1, msg_id, msgid2discid[msg_id], messages[msg_id], a_chck_flags, a_diff, a_sgm_strict)
-    # if a_chck_flags & CHCK_NUCLEARITY:
-    #     _update_attr_stat(a_argmnt_stat[DNUCLEARITY], NUCLEUS, subsegs, segs2trees1, \
-    #                           segs2trees2, a_diff)
-    # if a_chck_flags & CHCK_RELATIONS:
-    #     _update_attr_stat(a_argmnt_stat[DRELATIONS], RELNAME, subsegs, segs2trees1, \
-    #                           segs2trees2, a_diff)
+        for msg_id, msg_txt in messages.iteritems():
+            skip = False
+            if msg_id not in rstForrest1.msgid2iroots:
+                print >> sys.stderr, \
+                    """WARNING: Message {:s} was not annotated by the 1-st annotator""".format(msg_id)
+                skip = True
+            if msg_id not in rstForrest2.msgid2iroots:
+                print >> sys.stderr, \
+                    """WARNING: Message {:s} was not annotated by the 2-nd annotator""".format(msg_id)
+                skip = True
+            if skip:
+                continue
+            # print >> sys.stderr, "msg_id =", msg_id
+            _update_stat(agrmt_stat, rstForrest1.msgid2iroots[msg_id], \
+                             rstForrest2.msgid2iroots[msg_id], \
+                             msg_txt, chck_flags, a_diff, a_sgm_strict)
+
+    # perform neccessary agreement tests on the level of complete discussions
+    chck_flags = a_chck_flags & (CHCK_DNUCLEARITY | CHCK_DRELATIONS)
+    if chck_flags:
+        # align discussion trees from two files
+        msgid2dtree = defaultdict(lambda: (list(), list()))
+        for itree in rstForrest1.trees:
+            msgid2dtree[itree.msgid][0].append(itree)
+        for itree in rstForrest2.trees:
+            msgid2dtree[itree.msgid][-1].append(itree)
+        # print >> sys.stderr, "msgid2dtree = ", repr(msgid2dtree)
+        # perform neccessary agreement tests on the level of complete dicussions
+        for _, (trees1, trees2) in msgid2dtree.iteritems():
+            # only check nuclearity and relations for external trees
+            _update_stat(agrmt_stat, trees1, trees2, "", chck_flags, a_diff, None)
+            # sys.exit(66)
     # print per file statistics, if necessary
     if a_verbose:
         output_stat(agrmt_stat, sys.stdout, "Statistics on file {:s}".format(a_src_fname))
@@ -458,7 +468,8 @@ for evaluating segment agreement""", action = "store_true")
     argparser.add_argument("--src-ptrn", help = "shell pattern of source files", type = str,
                          default = "*")
     argparser.add_argument("--type", help = """type of element (relation) for which
-to measure the agreement""", choices = [SEGMENTS, NUCLEARITY, RELATIONS, ALL],
+to measure the agreement""", choices = [SEGMENTS, MNUCLEARITY, DNUCLEARITY, MRELATIONS, \
+                                            DRELATIONS, ALL],
                            type = str, action = "append")
     argparser.add_argument("-v", "--verbose", help = "output agreement statistics for each file", \
                                action = "store_true")
@@ -473,10 +484,14 @@ to measure the agreement""", choices = [SEGMENTS, NUCLEARITY, RELATIONS, ALL],
         for itype in set(args.type):
             if itype == SEGMENTS:
                 chck_flags |= CHCK_SEGMENTS
-            elif itype == NUCLEARITY:
-                chck_flags |= CHCK_NUCLEARITY
-            elif itype == RELATIONS:
-                chck_flags |= CHCK_RELATIONS
+            elif itype == MNUCLEARITY:
+                chck_flags |= CHCK_MNUCLEARITY
+            elif itype == DNUCLEARITY:
+                chck_flags |= CHCK_DNUCLEARITY
+            elif itype == MRELATIONS:
+                chck_flags |= CHCK_MRELATIONS
+            elif itype == DRELATIONS:
+                chck_flags |= CHCK_DRELATIONS
     else:
         chck_flags |= CHCK_ALL
 

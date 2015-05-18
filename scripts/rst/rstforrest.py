@@ -30,6 +30,7 @@ class RSTForrest(object):
 
     Variables:
     trees - set of most prominent RST trees
+    msgid2txt - mapping from message id to text
     msgid2iroots - mapping from message id to its corresponding (sub-)tree
     msgid2discid - dictionary mapping message id to its current number in
                discussions
@@ -40,17 +41,19 @@ class RSTForrest(object):
 
     """
 
-    def __init__(self, a_fmt = XML_FMT, a_msgid2discid = None):
+    def __init__(self, a_fmt, a_msgid2txt, a_msgid2discid = None):
         """
         Class constructor.
 
         @param a_fmt - format of input data
+        @param a_msgid2txt - dictionary mapping message id to its text
         @param a_msgid2discid - dictionary mapping message id to its current
                         number in discussions
 
         """
         self.trees = set()
         self.msgid2iroots = defaultdict(set)
+        self.msgid2txt = a_msgid2txt
         if a_msgid2discid is None:
             self.msgid2discid = defaultdict(lambda: 0)
         else:
@@ -128,6 +131,15 @@ class RSTForrest(object):
             if itree.terminal:
                 itree.start = itree.t_start = (self.msgid2discid[itree.msgid], itree.start)
                 itree.end = itree.t_end = (self.msgid2discid[itree.msgid], itree.end)
+                if not itree.text and not self.msgid2txt is None:
+                    assert itree.msgid in self.msgid2txt, "No text specified for\
+ terminal node {:s}".format(itree.msgid)
+                    itext = self.msgid2txt[itree.msgid]
+                    assert itree.end[-1] <= len(self.msgid2txt[itree.msgid]), \
+                        "End offset of node {:s} exceeds text length of its message {:s}\
+".format(itree.id, itree.msgid)
+                    itree.text = itext[itree.t_start[-1]:itree.t_end[-1]]
+                    itree.adjust_offsets()
             else:
                 itree.start = itree.end = (-1, -1)
             if not itree.external or itree.etype == TERMINAL:

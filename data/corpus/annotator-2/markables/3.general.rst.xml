@@ -823,7 +823,7 @@
         <segment id="350" msgid="321951756345044993" start="37" end="63" name="2" external="0" etype=""/>
         <segment id="349" msgid="321951756345044993" start="11" end="37" name="1" external="0" etype=""/>
         <segment id="88" msgid="329143039614398465" start="53" end="83" name="2" external="0" etype=""/>
-        <segment id="89" msgid="318995112493465600" start="0" end="71" name="0" external="1" etype="text"/>
+        <segment id="89" msgid="318995112493465600" start="0" end="70" name="0" external="1" etype="text"/>
         <segment id="90" msgid="318995484419186689" start="0" end="14" name="0" external="0" etype=""/>
         <segment id="351" msgid="320469269559271424" start="0" end="48" name="0" external="1" etype="text"/>
         <segment id="91" msgid="318995484419186689" start="14" end="71" name="1" external="0" etype=""/>
@@ -984,7 +984,7 @@
         <segment id="494" msgid="323004943005020160" start="0" end="20" name="0" external="0" etype=""/>
         <segment id="504" msgid="325197309128368128" start="10" end="40" name="1" external="0" etype=""/>
         <segment id="495" msgid="323004943005020160" start="20" end="95" name="1" external="0" etype=""/>
-        <segment id="505" msgid="325197309128368128" start="40" end="59" name="2" external="0" etype=""/>
+        <segment id="505" msgid="325197309128368128" start="40" end="58" name="2" external="0" etype=""/>
         <segment id="496" msgid="323005611245699074" start="0" end="8" name="0" external="0" etype=""/>
         <segment id="506" msgid="325223421455790084" start="0" end="10" name="0" external="0" etype=""/>
         <segment id="497" msgid="323005611245699074" start="8" end="21" name="1" external="0" etype=""/>
