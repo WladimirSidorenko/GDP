@@ -1409,12 +1409,12 @@
         <hypRelation relname="r-Elaboration">
             <spannode idref="-100"/>
             <nucleus idref="-98"/>
-            <satellite idref="108"/>
+            <satellite idref="-99"/>
         </hypRelation>
         <hypRelation relname="r-OTHER">
             <spannode idref="-486"/>
             <nucleus idref="-99"/>
-            <satellite idref="110"/>
+            <satellite idref="-487"/>
         </hypRelation>
         <hypRelation relname="Address">
             <spannode idref="-93"/>
@@ -1529,7 +1529,7 @@
         <hypRelation relname="r-Communicative-Interaction">
             <spannode idref="-487"/>
             <nucleus idref="-103"/>
-            <satellite idref="115"/>
+            <satellite idref="-106"/>
         </hypRelation>
         <hypRelation relname="Evaluation-S">
             <spannode idref="-105"/>
@@ -1589,7 +1589,7 @@
         <hypRelation relname="r-qElaboration">
             <spannode idref="-489"/>
             <nucleus idref="-111"/>
-            <satellite idref="129"/>
+            <satellite idref="-114"/>
         </hypRelation>
         <hypRelation relname="Evaluation-S">
             <spannode idref="-130"/>
@@ -1604,7 +1604,7 @@
         <hypRelation relname="r-Refutation">
             <spannode idref="-484"/>
             <nucleus idref="-114"/>
-            <satellite idref="133"/>
+            <satellite idref="-119"/>
         </hypRelation>
         <hypRelation relname="Address">
             <spannode idref="-132"/>
@@ -1634,7 +1634,7 @@
         <hypRelation relname="r-OTHER">
             <spannode idref="-490"/>
             <nucleus idref="-119"/>
-            <satellite idref="139"/>
+            <satellite idref="-120"/>
         </hypRelation>
         <hypRelation relname="Address">
             <spannode idref="-136"/>
@@ -1654,17 +1654,17 @@
         <hypRelation relname="r-InfoAnswer">
             <spannode idref="-479"/>
             <nucleus idref="165"/>
-            <satellite idref="166"/>
+            <satellite idref="-496"/>
         </hypRelation>
         <hypRelation relname="r-Elaboration">
             <spannode idref="-479"/>
             <nucleus idref="165"/>
-            <satellite idref="169"/>
+            <satellite idref="-497"/>
         </hypRelation>
         <hypRelation relname="r-Elaboration">
             <spannode idref="-479"/>
             <nucleus idref="165"/>
-            <satellite idref="175"/>
+            <satellite idref="-498"/>
         </hypRelation>
         <hypRelation relname="Address">
             <spannode idref="-127"/>
@@ -1684,7 +1684,7 @@
         <hypRelation relname="r-InfoAnswer">
             <spannode idref="-478"/>
             <nucleus idref="-128"/>
-            <satellite idref="151"/>
+            <satellite idref="-492"/>
         </hypRelation>
         <hypRelation relname="Address">
             <spannode idref="-131"/>
@@ -1699,17 +1699,17 @@
         <hypRelation relname="r-OTHER">
             <spannode idref="-492"/>
             <nucleus idref="-131"/>
-            <satellite idref="155"/>
+            <satellite idref="-132"/>
         </hypRelation>
         <hypRelation relname="r-OTHER">
             <spannode idref="-493"/>
             <nucleus idref="-132"/>
-            <satellite idref="157"/>
+            <satellite idref="-133"/>
         </hypRelation>
         <hypRelation relname="r-OTHER">
             <spannode idref="-494"/>
             <nucleus idref="-133"/>
-            <satellite idref="159"/>
+            <satellite idref="-135"/>
         </hypRelation>
         <hypRelation relname="Address">
             <spannode idref="-135"/>
@@ -1739,7 +1739,7 @@
         <hypRelation relname="r-Elaboration">
             <spannode idref="-496"/>
             <nucleus idref="-138"/>
-            <satellite idref="180"/>
+            <satellite idref="-151"/>
         </hypRelation>
         <hypRelation relname="Evaluation-S">
             <spannode idref="-149"/>
@@ -1824,7 +1824,7 @@
         <hypRelation relname="r-Elaboration">
             <spannode idref="-499"/>
             <nucleus idref="-151"/>
-            <satellite idref="196"/>
+            <satellite idref="-162"/>
         </hypRelation>
         <hypRelation relname="Evaluation-S">
             <spannode idref="-153"/>
@@ -1914,12 +1914,12 @@
         <hypRelation relname="r-Elaboration">
             <spannode idref="-481"/>
             <nucleus idref="220"/>
-            <satellite idref="221"/>
+            <satellite idref="-181"/>
         </hypRelation>
         <hypRelation relname="r-Elaboration">
             <spannode idref="-481"/>
             <nucleus idref="220"/>
-            <satellite idref="225"/>
+            <satellite idref="-183"/>
         </hypRelation>
         <hypRelation relname="Hashtag">
             <spannode idref="-171"/>
@@ -2029,7 +2029,7 @@
         <hypRelation relname="r-Elaboration">
             <spannode idref="-502"/>
             <nucleus idref="-183"/>
-            <satellite idref="230"/>
+            <satellite idref="-187"/>
         </hypRelation>
         <hypRelation relname="Address">
             <spannode idref="-485"/>
