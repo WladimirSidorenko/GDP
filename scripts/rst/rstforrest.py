@@ -137,7 +137,7 @@ class RSTForrest(object):
                     itext = self.msgid2txt[itree.msgid]
                     assert itree.end[-1] <= len(self.msgid2txt[itree.msgid]), \
                         "End offset of node {:s} exceeds text length of its message {:s}\
-".format(itree.id, itree.msgid)
+({:d} vs. {:d})".format(itree.id, itree.msgid, itree.t_end[-1], len(self.msgid2txt[itree.msgid]))
                     itree.text = itext[itree.t_start[-1]:itree.t_end[-1]]
                     itree.adjust_offsets()
             else:
