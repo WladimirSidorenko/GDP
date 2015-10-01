@@ -484,7 +484,7 @@
         <segment id="514" msgid="323911999891324928" start="0" end="75" name="0" external="1" etype="text"/>
         <segment id="515" msgid="323912157655875584" start="0" end="12" name="0" external="0" etype=""/>
         <segment id="516" msgid="323912157655875584" start="12" end="50" name="1" external="0" etype=""/>
-        <segment id="517" msgid="323912157655875584" start="50" end="61" name="2" external="0" etype=""/>
+        <segment id="517" msgid="323912157655875584" start="50" end="60" name="2" external="0" etype=""/>
         <segment id="518" msgid="323913705114968065" start="0" end="9" name="0" external="0" etype=""/>
         <segment id="520" msgid="323913705114968065" start="22" end="46" name="2" external="0" etype=""/>
         <segment id="519" msgid="323913705114968065" start="9" end="22" name="1" external="0" etype=""/>
