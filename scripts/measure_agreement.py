@@ -492,6 +492,9 @@ to measure the agreement""", choices = [SEGMENTS, MNUCLEARITY, DNUCLEARITY, MREL
                 chck_flags |= CHCK_MRELATIONS
             elif itype == DRELATIONS:
                 chck_flags |= CHCK_DRELATIONS
+            elif itype == ALL:
+                chck_flags |= CHCK_ALL
+                break
     else:
         chck_flags |= CHCK_ALL
 
