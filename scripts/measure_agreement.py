@@ -33,10 +33,11 @@ NUCLEUS = "nucleus"
 RELNAME = "relname"
 
 # auxiliary function used for creating initial statistics list
-KAPPA_GEN = lambda: [defaultdict(lambda: Counter()), []] # confusion matrix, list of differences
+# confusion matrix, list of differences
+KAPPA_GEN = lambda: [defaultdict(lambda: Counter()), []]
 
 # statistics dictionaries
-KAPPA_STAT = defaultdict(KAPPA_GEN) # total kappa statistics
+KAPPA_STAT = defaultdict(KAPPA_GEN)  # total kappa statistics
 
 # constants specifying which RST elements should be tested
 SEGMENTS = "segments"
@@ -53,6 +54,7 @@ CHCK_DRELATIONS = 16
 CHCK_RELATIONS = CHCK_MRELATIONS | CHCK_DRELATIONS
 ALL = "all"
 CHCK_ALL = 31
+
 
 ##################################################################
 # Methods

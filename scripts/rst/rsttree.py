@@ -29,9 +29,10 @@ import sys
 
 ##################################################################
 # Constants
-QUOTE = re.compile("([\"'])")
-ESCAPED = r"\\\1"
+QUOTE = re.compile(u"([\"'])", re.U)
+ESCAPED = ur"\\\1"
 EXT_REL_PRFX = "r-"
+
 
 ##################################################################
 # Class
@@ -108,7 +109,15 @@ class RSTTree(object):
         """
         if not isinstance(a_other, RSTTree):
             raise RSTBadLogic("Can't compare RST tree with {:s}".format(a_other.__class__.__name__))
-        return id(self) == id(a_other)
+        return self.id == a_other.id and self.msgid == a_other.msgid
+
+    def __hash__(self):
+        """Return hash key for the given element.
+
+        @return tuple: message id, node id
+
+        """
+        return int(self.id) ^ int(self.msgid)
 
     def __ne__(self, a_other):
         """
@@ -174,13 +183,13 @@ class RSTTree(object):
         """
         return self.unicode_min(a_flag, a_attrs).encode(ENCODING)
 
-    def unicode_min(self, a_flag = TREE_INTERNAL, *a_attrs):
-        """
-        Return minimal unicode representation of the given tree.
+    def unicode_min(self, a_flag=TREE_INTERNAL, *a_attrs):
+        """Return minimal unicode representation of the given tree.
 
         @param a_attrs - attributes that should be printed for trees
 
         @return minimal unicode representation
+
         """
         ret = u'\t' * self._nestedness
         ret += u"("
@@ -192,24 +201,28 @@ class RSTTree(object):
                     avalue = getattr(attr, None)
                     if avalue is not None:
                         ret += " (" + attr + ' ' + avalue + ')'
+        text = ""
         if self.terminal:
-            ret += u" (text " + self._escape_text(self.text) + ")"
+            text = self.text.decode("utf-8", errors="ignore")
+            ret += u" (text " + \
+                   self._escape_text(text) \
+                   + u")"
         else:
             ret += u"..."
 
         orig_nestedness = 0
         chld_nestedness = self._nestedness + 1
         if a_flag & TREE_INTERNAL:
-            for ch in self.ichildren():
+            for ch_tree in self.ichildren:
                 orig_nestedness = ch_tree._nestedness
                 ch_tree._nestedness = chld_nestedness
-                ret += '\n' + ch_tree.unicode_min()
+                ret += u'\n' + ch_tree.unicode_min()
                 ch_tree._nestedness = orig_nestedness
         if a_flag & TREE_EXTERNAL:
             for ch in self.echildren():
                 orig_nestedness = ch_tree._nestedness
                 ch_tree._nestedness = chld_nestedness
-                ret += '\n' + ch_tree.unicode_min()
+                ret += u'\n' + ch_tree.unicode_min()
                 ch_tree._nestedness = orig_nestedness
         return ret
 
@@ -261,7 +274,7 @@ class RSTTree(object):
         self.start = self.t_start = (self.t_start[0], self.t_start[-1] + delta_start)
         self.end = self.t_end = (self.t_end[0], self.t_end[-1] - delta_end)
 
-    def get_edus(self, a_flag = TREE_INTERNAL):
+    def get_edus(self, a_flag=TREE_INTERNAL):
         """
         Return list of descendant terminal trees in sorted order.
 
@@ -284,33 +297,36 @@ class RSTTree(object):
         ret.sort(key = lambda edu: edu.start)
         return ret
 
-    def get_subtrees(self, a_flag = TREE_INTERNAL):
-        """
-        Return list of all descendant trees in sorted order.
+    def get_subtrees(self, a_flag=TREE_INTERNAL):
+        """Return list of all descendant trees in sorted order.
 
         @param a_flag - (optional) flag indicating which descendants (internal
                         or external, or both) should be returned
 
-        @return list of descendant trees
+        @return set of descendant trees
+
         """
         ret = []
         ret.append(self)
-        if a_flag & TREE_INTERNAL:
-            if not self.external or self.etype == TERMINAL:
-                for ch in self.ichildren:
-                    ret += ch.get_subtrees(a_flag)
-                ret.sort()
-            else:
-                for ch in self.ichildren:
-                    if ch.msgid == self.msgid:
-                        return ch.get_subtrees()
         if a_flag & TREE_EXTERNAL:
             for ch in self.echildren:
                 ret += ch.get_subtrees(a_flag)
             if self.external and self.etype != TERMINAL:
                 for ch in self.ichildren:
                     ret += ch.get_subtrees(a_flag)
-        return ret
+        if a_flag & TREE_INTERNAL:
+            if not self.external or self.etype == TERMINAL:
+                for ch in self.ichildren:
+                    ret += ch.get_subtrees(a_flag)
+                ret.sort()
+            else:
+                if not (a_flag & TREE_EXTERNAL and
+                        self.external and
+                        self.etype != TERMINAL):
+                    for ch in self.ichildren:
+                        if ch.msgid == self.msgid:
+                            return set(ret + ch.get_subtrees())
+        return set(ret)
 
     def update(self, **a_attrs):
         """
@@ -342,7 +358,7 @@ class RSTTree(object):
 
         @return text with escaped brackets
         """
-        return '"' + QUOTE.sub(ESCAPED, a_text) + '"'
+        return u'"' + QUOTE.sub(ESCAPED, a_text) + u'"'
 
     def _update_tstart_tend(self, a_start, a_end):
         """

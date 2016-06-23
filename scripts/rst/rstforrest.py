@@ -22,6 +22,7 @@ from itertools import chain
 
 import sys
 
+
 ##################################################################
 # Class
 class RSTForrest(object):
@@ -41,7 +42,7 @@ class RSTForrest(object):
 
     """
 
-    def __init__(self, a_fmt, a_msgid2txt, a_msgid2discid = None):
+    def __init__(self, a_fmt, a_msgid2txt, a_msgid2discid=None):
         """
         Class constructor.
 
@@ -116,12 +117,15 @@ class RSTForrest(object):
         import xml.etree.ElementTree as ET
         idoc = ET.parse(a_file).getroot()
         # read segments and spans
-        iid = -1; itree = None
-        inodes = chain(idoc.iterfind("segments/segment"), idoc.iterfind("spans/span"))
+        iid = -1
+        itree = None
+        inodes = chain(idoc.iterfind("segments/segment"),
+                       idoc.iterfind("spans/span"))
         for inode in inodes:
             iid = inode.attrib.pop("id")
             inode.attrib["type"] = inode.tag
-            inode.attrib["discid"] = self.msgid2discid[inode.attrib.get("msgid")]
+            inode.attrib["discid"] = \
+                self.msgid2discid[inode.attrib.get("msgid")]
             # get/create appropriate tree for the given node id
             itree = RSTTree(iid, **inode.attrib)
             self._nid2tree[iid] = itree
@@ -129,15 +133,20 @@ class RSTForrest(object):
             self._nid2msgid[iid] = itree.msgid
             # set `t_start` and `t_end` of terminal nodes
             if itree.terminal:
-                itree.start = itree.t_start = (self.msgid2discid[itree.msgid], itree.start)
-                itree.end = itree.t_end = (self.msgid2discid[itree.msgid], itree.end)
+                itree.start = itree.t_start = (self.msgid2discid[itree.msgid],
+                                               itree.start)
+                itree.end = itree.t_end = (self.msgid2discid[itree.msgid],
+                                           itree.end)
                 if not itree.text and not self.msgid2txt is None:
-                    assert itree.msgid in self.msgid2txt, "No text specified for\
- terminal node {:s}".format(itree.msgid)
+                    assert itree.msgid in self.msgid2txt, \
+                        "No text specified for terminal node {:s}".format(
+                            itree.msgid)
                     itext = self.msgid2txt[itree.msgid]
                     assert itree.end[-1] <= len(self.msgid2txt[itree.msgid]), \
-                        "End offset of node {:s} exceeds text length of its message {:s}\
-({:d} vs. {:d})".format(itree.id, itree.msgid, itree.t_end[-1], len(self.msgid2txt[itree.msgid]))
+                        "End offset of node {:s} exceeds text length of its" \
+                        " message {:s} ({:d} vs. {:d})".format(
+                            itree.id, itree.msgid, itree.t_end[-1],
+                            len(self.msgid2txt[itree.msgid]))
                     itree.text = itext[itree.t_start[-1]:itree.t_end[-1]]
                     itree.adjust_offsets()
             else:
@@ -149,21 +158,31 @@ class RSTForrest(object):
         span_id = nuc_id = sat_id = None
         span_tree = nuc_tree = sat_tree = None
         for irel in idoc.iterfind(".//hypRelation"):
-            span_id = irel.find("spannode").get("idref"); span_tree = self._nid2tree[span_id]
-            nuc_id = irel.find("nucleus").get("idref"); nuc_tree = self._nid2tree[nuc_id]
-            sat_id = irel.find("satellite").get("idref"); sat_tree = self._nid2tree[sat_id]
+            span_id = irel.find("spannode").get("idref")
+            span_tree = self._nid2tree[span_id]
+            nuc_id = irel.find("nucleus").get("idref")
+            nuc_tree = self._nid2tree[nuc_id]
+            sat_id = irel.find("satellite").get("idref")
+            sat_tree = self._nid2tree[sat_id]
             # update parent and child information of nucleus and satellite
-            nuc_tree.relname = "span"; nuc_tree.parent = span_tree; nuc_tree.nucleus = True
-            sat_tree.relname = irel.get("relname"); sat_tree.parent = nuc_tree; sat_tree.nucleus = False
+            nuc_tree.relname = "span"
+            nuc_tree.parent = span_tree
+            nuc_tree.nucleus = True
+            sat_tree.relname = irel.get("relname")
+            sat_tree.parent = nuc_tree
+            sat_tree.nucleus = False
             # update child information of nucleus and span
             nuc_tree.add_children(sat_tree)
             span_tree.add_children(nuc_tree)
             # remove nucleus and satellite from the list of tree roots
-            self.trees.discard(sat_tree); self.trees.discard(nuc_tree)
-            # remove nucleus and satellite from the list of internal message tree roots
+            self.trees.discard(sat_tree)
+            self.trees.discard(nuc_tree)
+            # remove nucleus and satellite from the list of internal message
+            # tree roots
             if nuc_tree.msgid == span_tree.msgid:
                 iroots = self.msgid2iroots[nuc_tree.msgid]
-                iroots.discard(sat_tree); iroots.discard(nuc_tree)
+                iroots.discard(sat_tree)
+                iroots.discard(nuc_tree)
         # read paratactic relations
         relname = ""
         internal = False
